@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/flashcards.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="flashcards-page">
+    <div class="flashcards-container">
+        <header class="flashcards-header">
+            <h1 class="flashcards-title">
+                <span class="flashcards-emoji">🧠</span>
+                Flashcards
+            </h1>
+            <p class="flashcards-subtitle">Level up your study game with AI-generated flashcards from your text or slides.</p>
+        </header>
+
+        <section class="form-section">
+            <h2 class="section-title">
+                <div class="section-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                Generate Your Flashcards
+            </h2>
+            <form id="flashcardForm" method="post" action="{% url 'generate_flashcards' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="study_text" class="form-label">
+                            <i class="fas fa-file-alt"></i>
+                            Your Study Text or Notes
+                        </label>
+                        <textarea id="study_text" name="study_text" class="form-textarea" placeholder="Paste your study text here..." required>{{ study_text }}</textarea>
+                        <div class="form-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Enter your notes, and we'll create flashcards for you.
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="topic" class="form-label">
+                            <i class="fas fa-tag"></i>
+                            Topic (Optional)
+                        </label>
+                        <input type="text" id="topic" name="topic" class="form-input" placeholder="e.g., 'Biochemistry', 'World War II', 'Python Basics'">
+                        <div class="form-hint">
+                            <i class="fas fa-lightbulb"></i>
+                            Add a topic to help the AI generate better flashcards.
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="generate-btn" id="generateBtn">
+                    <i class="fas fa-bolt"></i>
+                    Generate Flashcards
+                </button>
+            </form>
+        </section>
+
+        {% if flashcards %}
+        <section class="flashcard-display">
+            <div class="flashcard-header">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    Your Flashcards
+                </h2>
+                <span class="flashcard-counter" id="flashcard-counter">1 of {{ flashcards|length }}</span>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-label">
+                    <div class="progress-title">Progress</div>
+                    <div class="progress-percentage" id="progress-percentage">0%</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+
+            <div id="flashcard-wrapper">
+                {% for flashcard in flashcards %}
+                <div class="flashcard" data-index="{{ forloop.counter0 }}">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <div class="card-content">{{ flashcard.front|safe }}</div>
+                            <div class="flip-hint">Tap to flip</div>
+                        </div>
+                        <div class="flashcard-back">
+                            <div class="card-content">{{ flashcard.back|safe }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="flashcard-controls">
+                <button class="control-btn prev-btn" id="prevBtn" disabled>
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                <button class="control-btn flip-btn" id="flipBtn">
+                    <i class="fas fa-sync-alt"></i> Flip
+                </button>
+                <button class="control-btn next-btn" id="nextBtn">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+        {% endif %}
+
+        {% if error_message %}
+        <div class="error-message">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div>{{ error_message|safe }}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_body %}
+<script src="{% static 'js/flashcards.js' %}"></script>
+{% endblock %}

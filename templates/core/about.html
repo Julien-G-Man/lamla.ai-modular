@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About Lamla AI{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/about.css' %}">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<main class="about-page">
+    <section class="about-hero" data-aos="fade-up">
+        <div class="hero-bg-overlay"></div>
+        <div class="about-hero-content container">
+            <h1 class="about-hero-title">
+                About <span class="highlight">Lamla-AI</span>
+            </h1>
+            <p class="about-hero-desc">
+                <strong>Lamla-AI</strong> is a smart exam preparation platform designed to help you study with intention, not panic.<br>
+                Lamla AI replaces guesswork with guided, personalized study by combining AI-generated quizzes, real-time feedback, and performance insights.<br>
+                <b>Study Smarter. Perform Better.</b>
+            </p>
+        </div>
+    </section>
+
+    <div class="about-content-wrapper">
+        <div class="container">
+            <section class="about-page-section about-tabs-container" data-aos="fade-up" data-aos-delay="200">
+                <div class="section-header">
+                    <h2>Our Core<span class="highlight"> Principles</span></h2>
+                    <p>Learn about the mission, vision, and values that drive us.</p>
+                </div>
+                <div class="about-tabs" id="aboutTabs">
+                    <button class="about-tab active" data-tab="mission">Mission</button>
+                    <button class="about-tab" data-tab="vision">Vision</button>
+                    <button class="about-tab" data-tab="values">Values</button>
+                    <button class="about-tab" data-tab="offers">What We Offer</button>
+                </div>
+
+                <div class="about-tab-content active" id="mission-tab-content">
+                    <div class="content-list-group">
+                        <h3><span class="emoji">🎯</span> Our Mission</h3>
+                        <p>To empower students to learn deeply, track their understanding, and focus on what matters most—across their academic journey, from early prep to final revision.</p>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Replace guesswork with guided, personalized study</li>
+                            <li><i class="fas fa-check-circle"></i> Assess knowledge and strengthen weak areas</li>
+                            <li><i class="fas fa-check-circle"></i> Build mastery through active recall, not cramming</li>
+                            <li><i class="fas fa-check-circle"></i> Prepare with intention, not panic</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="about-tab-content" id="vision-tab-content">
+                    <div class="content-list-group">
+                        <h3><span class="emoji">🚀</span> Our Vision</h3>
+                        <p>To redefine academic readiness—starting from Africa, for the world—by making purposeful, AI-powered study accessible to every student.</p>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Enable students to prepare smarter, not just harder</li>
+                            <li><i class="fas fa-check-circle"></i> Support mastery, not just survival</li>
+                            <li><i class="fas fa-check-circle"></i> Scale globally, starting with high-syllabus, paper-based exam systems</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="about-tab-content" id="values-tab-content">
+                    <div class="content-list-group">
+                        <h3><span class="emoji">🧭</span> Our Values</h3>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Clarity over confusion: Guided, purposeful study</li>
+                            <li><i class="fas fa-check-circle"></i> Growth over shortcuts: Mastery through active recall</li>
+                            <li><i class="fas fa-check-circle"></i> Focus over panic: Tools to support real learning</li>
+                            <li><i class="fas fa-check-circle"></i> Integrity: Lamla is not a cramming or cheat tool</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="about-tab-content" id="offers-tab-content">
+                    <div class="content-list-group">
+                        <h3><span class="emoji">💡</span> What Lamla-AI Offers</h3>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Upload study materials (PDF/text) for quiz generation</li>
+                            <li><i class="fas fa-check-circle"></i> AI-generated quizzes with instant feedback</li>
+                            <li><i class="fas fa-check-circle"></i> Performance tracking with color-coded insights</li>
+                            <li><i class="fas fa-check-circle"></i> Subject and topic selection for focused study</li>
+                            <li><i class="fas fa-check-circle"></i> A multilingual assistant copilot to support you on your journey to success</li>
+                        </ul>
+                        <p>Lamla-AI is not a shortcut or a cheat—it's a smart compass for students who want to prepare better, not later.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-header" data-aos="fade-up" data-aos-delay="300">
+                <h2>🤝 <span class="highlight"> Join the </span>Journey</h2>
+                <p>If you want to prepare with purpose, not panic—Lamla-AI was built for you.</p>
+                <p>This is more than a platform. It's a toolset. A mindset. A movement.</p>
+                <p><strong>Study Smarter. Perform Better.</strong></p>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'account_signup' %}" class="get-started-btn">
+                        <span>Get Started</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                {% endif %}
+            </section>
+
+            <section class="about-page-section about-founder-section" data-aos="fade-up" data-aos-delay="400">
+                <div class="section-header">
+                    <h2>Meet the <span class="highlight">Founder</span></h2>
+                    <p>The person behind the vision of purposeful education.</p>
+                </div>
+                <div class="about-founder-card">
+                    <div class="about-founder-card-top">
+                        <img src="https://cdn.creazilla.com/icons/3209624/incognito-circle-icon-md.png" alt="Founder Photo" class="about-founder-photo">
+                    </div>
+                    <div class="about-founder-content">
+                        <p class="about-founder-name">Incognito</p>
+                        <p class="about-founder-role">Founder</p>
+                        <p class="about-founder-desc">
+                            Just some random guy trying to help. Driven by the belief that every student deserves effective tools to conquer their academic challenges.
+                        </p>
+                        <a href="https://www.instagram.com/lamla.io" class="view-profile-btn" target="_blank" rel="noopener">
+                            <span>View Profile</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <div class="about-founder-socials">
+                            <a href="https://linkedin.com/company/lamla-ai" title="LinkedIn" target="_blank" rel="noopener">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <a href="https://x.com/lamla_io" title="X (formerly Twitter)" target="_blank" rel="noopener">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="https://www.facebook.com/share/16pmyhCiUM/" title="Facebook" target="_blank" rel="noopener">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://instagram.com/lamla.io" title="Instagram" target="_blank" rel="noopener">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="mailto:lamlaaiteam@gmail.com" title="Email">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="about-page-section about-contact-section" id="get-in-touch" data-aos="fade-up" data-aos-delay="500">
+                <div class="section-header">
+                    <h2>📧 Get in Touch</h2>
+                    <p>Have questions, suggestions, or want to share your experience? We'd love to hear from you!</p>
+                </div>
+                
+                {% if messages %}
+                    <div class="django-messages-container">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form class="contact-form" method="post" action="{% url 'contact' %}" id="contactForm">
+                    {% csrf_token %}
+                    <div class="contact-form-row">
+                        <div class="contact-form-group">
+                            <input type="text" class="contact-input" name="name" placeholder="Your Name" required aria-label="Your Name">
+                        </div>
+                        <div class="contact-form-group">
+                            <input type="email" class="contact-input" name="email" placeholder="Your Email" required aria-label="Your Email">
+                        </div>
+                    </div>
+                    <div class="contact-form-group">
+                        <input type="text" class="contact-input" name="subject" placeholder="Subject" required aria-label="Subject">
+                    </div>
+                    <div class="contact-form-group">
+                        <textarea class="contact-textarea" name="message" placeholder="Your Message" required aria-label="Your Message" rows="5"></textarea>
+                    </div>
+                    <button type="submit" class="cta-btn contact-btn">
+                        <span>Send Message</span>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </section>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_body %}
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="{% static 'js/about.js' %}"></script>
+{% endblock %}

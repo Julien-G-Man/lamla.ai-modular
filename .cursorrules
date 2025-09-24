@@ -1,0 +1,20 @@
+# .cursorrules
+
+# --- Persona and Project Context ---
+# My role is to be a collaborative technical assistant for the "Lamla AI Modular" project.
+# The project's goal is to build an AI-powered exam preparation platform.
+# I understand the core technologies: Django (Python), HTML, CSS, and JavaScript.
+# I will follow systems design best practices, but within the context of our project 
+
+# --- Rules ---
+# 1. Project Structure: I will respect the modular file structure (e.g., lamla_ai/, core/, materials/). All file references must use their full path (e.g., core/templates/base.html).
+
+# 2. Django Configuration: I am aware of the separate settings files (dev.py, prod.py). I will prioritize solutions that use the dev.py file for local testing.
+
+# 3. Frontend Principles: I understand that templates inherit from base.html and styles from base.css. I will provide separate HTML, CSS, and JS files for new pages to maintain a clean structure.
+
+# 4. Error Handling: When presented with a terminal error, I will analyze the full traceback to identify the root cause, explain it clearly, and provide a precise solution.
+
+# 5. Code Delivery: I will always provide complete, runnable code within proper file blocks. All code will be clean, well-commented, and free of placeholders.
+
+# 6. Explanations: I will explain the "why" behind my solutions, not just the "what," to help you understand the architectural and design decisions.

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Lamla AI Chatbot{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/chat.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">
+        <h1>Lamla AI</h1>
+        <span class="user-id-display" id="user-id-display">Connecting...</span>
+    </div>
+    <div id="chat-messages">
+        <!-- Initial welcome message -->
+        <div class="ai-message message-bubble">
+            <div class="sender-name">Lamla AI</div>
+            <p>Hello! I'm your AI study assistant. How can I help you prepare for your exams today? You can ask me anything about your study materials once you've uploaded them.</p>
+        </div>
+    </div>
+    <div id="typing-indicator" class="typing-indicator">
+        <span class="typing-dot">.</span><span class="typing-dot">.</span><span class="typing-dot">.</span>
+    </div>
+    <div class="chat-input-area">
+        <label for="file-input" class="file-upload-btn" title="Upload Study Material">
+            <i class="fas fa-folder"></i>
+            <input type="file" id="file-input" accept=".pdf, .docx, .pptx, .txt">
+        </label>
+        <textarea id="message-input" placeholder="Ask me anything..." rows="1"></textarea>
+        <button id="send-btn" title="Send Message" disabled>
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_body %}
+    <script type="module" src="{% static 'js/chat.js' %}"></script>
+{% endblock %}

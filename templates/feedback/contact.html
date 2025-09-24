@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - Lamla AI{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/contact.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="contact-page">
+    <section class="contact-hero-section">
+        <div class="container hero-content-container">
+            <div class="hero-content">
+                <h1 class="hero-title animate-in" data-delay="0s">
+                    <span class="hello-yellow">Get in</span> 
+                    <span class="username-highlight">Touch</span>
+                </h1>
+                <p class="hero-subtitle animate-in" data-delay="0.2s">
+                    Have questions or feedback? We'd love to hear from you and help you succeed!
+                </p>
+            </div>
+            <div class="hero-illustration animate-in" data-delay="0.4s">
+                <i class="fas fa-headset contact-hero-icon"></i>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-main-section">
+        <div class="container contact-grid">
+            <div class="contact-form-card animate-in">
+                <div class="card-header">
+                    <h2><i class="fas fa-envelope"></i> Send a Message</h2>
+                    <p>We'll get back to you within 24 hours.</p>
+                </div>
+                <div class="card-content">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                <i class="fas fa-{{ message.tags|yesno:'check-circle,exclamation-circle' }}"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <form action="{% url 'submit_feedback' %}" method="post" id="contactForm">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" name="name" class="contact-input" placeholder="e.g., John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" class="contact-input" placeholder="e.g., example@domain.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" class="contact-input" placeholder="e.g., Question about Quizzes" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Your Message</label>
+                            <textarea id="message" name="message" rows="5" class="contact-textarea" placeholder="Type your message here..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary contact-submit-btn">Send Message</button>
+                    </form>
+                </div>
+            </div>
+            <div class="contact-info-card animate-in" data-delay="0.2s">
+                <div class="info-item">
+                    <i class="fas fa-map-marker-alt info-icon"></i>
+                    <div class="info-content">
+                        <h3>Our Location</h3>
+                        <p>123 AI Learning Lane, Accra, Ghana</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-envelope info-icon"></i>
+                    <div class="info-content">
+                        <h3>Email Us</h3>
+                        <p>support@lamla.ai</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-phone-alt info-icon"></i>
+                    <div class="info-content">
+                        <h3>Call Us</h3>
+                        <p>+233 55 555 5555</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_body %}
+    <script src="{% static 'js/contact.js' %}"></script>
+{% endblock %}

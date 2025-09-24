@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lamla AI | Level Up Your Exam Game with AI{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="home-page">
+    <section class="hero-section">
+        <div class="hero-content" data-aos="fade-up">
+            <div class="hero-badge">
+                <span class="badge-icon">🚀</span>
+                <span>AI-Powered Learning Platform</span>
+            </div>
+            
+            <h1 class="hero-title">
+                <span class="title-line">Level Up Your Exam Game with</span>
+                <span class="brand-highlight">Lamla AI</span>
+            </h1>
+            
+            <p class="hero-desc">
+                Lamla AI is a smart exam preparation assistant designed to help you study with intention, not panic. 
+                Upload your study materials and transform them into interactive quizzes and flashcards, get instant 
+                feedback and performance insights with AI-powered learning tools.
+                <br><strong class="highlight-text">Study smarter. Perform better.</strong>
+            </p>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">Students</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">250+</span>
+                    <span class="stat-label">Quizzes Generated</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">92%</span>
+                    <span class="stat-label">Success Rate</span>
+                </div>
+            </div>
+            
+            <div class="hero-btns">
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'account_signup' %}" class="hero-btn primary">
+                        <span>Get Started Free</span>
+                        <div class="btn-shine"></div>
+                    </a>
+                {% else %}   
+                    <a href="{% url 'custom_quiz' %}" class="hero-btn primary">
+                        <span>Start Practicing</span>
+                        <div class="btn-shine"></div>
+                    </a>
+                {% endif %}
+                <a href="#features" class="hero-btn secondary">
+                    <span>Explore Features</span>
+                    <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features-section">
+        <div class="section-bg">
+            <div class="bg-pattern"></div>
+        </div>
+        
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <div class="section-badge">
+                    <span>✨ Features</span>
+                </div>
+                <h2>Smart Features for <span class="brand-highlight"> Smart Students</span></h2>
+                <p>Lamla AI helps you prepare with purpose using these core features:</p>
+            </div>
+            
+            <div class="features-grid">
+                <a href="{% url 'custom_quiz' %}" class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card-glow"></div>
+                    <div class="feature-icon">
+                        <span class="icon-emoji">🧠</span>
+                        <div class="icon-bg"></div>
+                    </div>
+                    <h3 class="feature-title">Quiz Mode</h3>
+                    <p class="feature-desc">Automatically generates multiple-choice questions from your materials or typed content. Get instant feedback on your responses.</p>
+                    <div class="feature-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </div>
+                </a>
+                
+                <a href="{% url 'chatbot' %}" class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="card-glow"></div>
+                    <div class="feature-icon">
+                        <span class="icon-emoji">🤖</span>
+                        <div class="icon-bg"></div>
+                    </div>
+                    <h3 class="feature-title">AI Chatbot</h3>
+                    <p class="feature-desc">Get instant answers to your questions and deeper explanations of complex topics.</p>
+                    <div class="feature-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </div>
+                </a>
+
+                <a href="{% url 'custom_quiz' %}" class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card-glow"></div>
+                    <div class="feature-icon">
+                        <span class="icon-emoji">📄</span>
+                        <div class="icon-bg"></div>
+                    </div>
+                    <h3 class="feature-title">Upload Study Materials</h3>
+                    <p class="feature-desc">Upload PDF or text-based materials. Content is extracted to power quiz generation.</p>
+                    <div class="feature-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </div>
+                </a>
+
+                <a href="#exam-analyzer" class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card-glow"></div>
+                    <div class="feature-icon">
+                        <span class="icon-emoji">🔍</span>
+                        <div class="icon-bg"></div>
+                    </div>
+                    <h3 class="feature-title">Exam Pattern Analysis</h3>
+                    <p class="feature-desc">Analyze your uploaded exams or quizzes and slides for instant feedback, topic breakdown, and personalized study recommendations.</p>
+                    <div class="feature-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </div>
+                </a>                
+
+                <a href="/dashboard/#recent-activity" class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card-glow"></div>
+                    <div class="feature-icon">
+                        <span class="icon-emoji">📊</span>
+                        <div class="icon-bg"></div>
+                    </div>
+                    <h3 class="feature-title">Performance Analytics</h3>
+                    <p class="feature-desc">Track your progress and identify your weak points to focus your study efforts effectively.</p>
+                    <div class="feature-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </div>
+                </a>
+
+                <a href="#custom_quiz" class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card-glow"></div>
+                    <div class="feature-icon">
+                        <span class="icon-emoji">📚</span>
+                        <div class="icon-bg"></div>
+                    </div>
+                    <h3 class="feature-title">Subject + Topic Selection</h3>
+                    <p class="feature-desc">Select your subject or topic before quiz generation. Early foundation for syllabus-aware functionality.</p>
+                    <div class="feature-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                        </svg>
+                    </div>
+                </a>                 
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <div class="section-badge">
+                    <span>🌟 Testimonials</span>
+                </div>               
+                <h2>What Our Students Are <span class="highlight">Saying</span></h2>
+                <p>Don't just take our word for it—see what students like you have to say.</p>               
+            </div>
+            
+            <!-- This is the new div for the testimonial grid -->
+            <div class="testimonials-grid">
+                <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="testimonial-rating">
+                        <div class="stars">
+                            <span class="star">⭐⭐⭐⭐⭐</span>
+                        </div>
+                        <div><span class="rating-text">4.9/5 from 50+ students</span></div>
+                    </div>
+                    
+                    <blockquote class="testimonial-quote">
+                        "Lamla AI helped me turn my lecture slides into practice quizzes and flashcards in seconds. 
+                        It's an amazing tool for exam preparation and has saved me countless hours searching for past questions!"
+                    </blockquote>
+                    
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <span>CN</span>
+                        </div>
+                        <div class="author-info">
+                            <p class="author-name">Christopher N</p>
+                            <p class="author-title">Student @ KNUST</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- More testimonial cards here -->
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_body %}
+    <script src="{% static 'js/home.js' %}"></script>
+{% endblock %}

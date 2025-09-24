@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Lamla AI{% endblock %}</title>
+    
+    <meta name="description" content="Lamla AI - Elevate Your Exam Game  With AI">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    
+    <link rel="icon" href="{% static 'graphics/favicon.ico' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <div class="site-wrapper">
+        <header class="main-header">
+            <div class="container header-container">
+                <a href="{% url 'home' %}" class="logo">
+                    <img src="{% static 'img/lamla_logo.png' %}" alt="Lamla AI Logo" class="logo-img">
+                    <span class="brand-highlight">Lamla.ai</span>
+                </a>
+                
+                <nav class="main-nav" id="main-nav">
+                    <ul class="nav-links">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'about' %}">About</a></li>
+                        <li><a href="{% url 'custom_quiz' %}">Quiz</a></li>
+                        <li><a href="{% url 'flashcards' %}">Flashcards</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                        <li><a href="{% url 'exam_analyzer' %}">Analytics</a></li>
+                        
+                        {% if user.is_authenticated %}
+                            <li class="nav-item-cta"><a href="{% url 'dashboard' %}" class="btn btn-nav-cta">Dashboard</a></li>
+                            <li class="nav-item-cta"><a href="{% url 'account_logout' %}" class="btn btn-nav-secondary">Logout</a></li>
+                        {% else %}
+                            <li class="nav-item-cta"><a href="{% url 'account_signup' %}" class="btn btn-nav-secondary">Sign Up</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                
+                <button class="nav-toggle" id="nav-toggle" aria-label="toggle navigation">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </header>
+        
+        <main class="main-content">
+            {% if messages %}
+                <ul class="messages-list">
+                    {% for message in messages %}
+                        <li class="message-item message-{{ message.tags }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            
+            {% block content %}{% endblock %}
+        </main>
+        
+        <footer class="main-footer">
+            <div class="container footer-grid">
+                <div class="footer-col footer-about">
+                      <h3>Contact Us</h3>
+                      <ul>
+                          <li>
+                              <a href="mailto:lamlaaiteam@gmail.com">
+                                  <i class="fas fa-envelope"></i>
+                            lamlaaiteam@gmail.com
+                              </a>
+                          </li>
+                          <li>
+                              <a href="tel:+233509341251">
+                                  <i class="fas fa-phone"></i>
+                            +233 50 934 1251
+                              </a>
+                          </li>
+                      </ul>
+                </div>                
+                    
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'about' %}">About Us</a></li>
+                        <li><a href="{% url 'contact' %}">Contact</a></li>
+                        <li><a href="{% url 'custom_quiz' %}">Quiz</a></li>
+                        <li><a href="{% url 'flashcards' %}">Flashcards</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Connect With Us</h3>
+                    <div class="social-icons">
+                        <a href="https://www.instagram.com/lamla.io" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.linkedin.com/company/lamla-ai" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+               <p>&copy; 2025 Lamla AI. All rights reserved.</p>
+               <div class="legal-links">
+                  <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+                  <a href="{% url 'terms_of_service' %}">Terms of Service</a>
+                  <a href="{% url 'cookie_policy' %}">Cookie Policy</a>
+               </div>
+            </div>
+        </footer>
+    </div>
+    
+    <script src="{% static 'js/base.js' %}"></script>
+    
+    {% block extra_body %}{% endblock %}
+</body>
+</html>
