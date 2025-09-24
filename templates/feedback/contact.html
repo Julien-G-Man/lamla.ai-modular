@@ -8,88 +8,176 @@
 {% endblock %}
 
 {% block content %}
-<main class="contact-page">
-    <section class="contact-hero-section">
-        <div class="container hero-content-container">
+<div class="container">
+    <div class="contact-page">
+        <div class="contact-hero">
             <div class="hero-content">
-                <h1 class="hero-title animate-in" data-delay="0s">
+                <h1 class="hero-title">
                     <span class="hello-yellow">Get in</span> 
                     <span class="username-highlight">Touch</span>
                 </h1>
-                <p class="hero-subtitle animate-in" data-delay="0.2s">
-                    Have questions or feedback? We'd love to hear from you and help you succeed!
-                </p>
+                <p class="hero-subtitle">Have questions or feedback? We'd love to hear from you and help you succeed!</p>
             </div>
-            <div class="hero-illustration animate-in" data-delay="0.4s">
+            <div class="hero-illustration">
                 <i class="fas fa-headset contact-hero-icon"></i>
             </div>
         </div>
-    </section>
 
-    <section class="contact-main-section">
-        <div class="container contact-grid">
-            <div class="contact-form-card animate-in">
-                <div class="card-header">
-                    <h2><i class="fas fa-envelope"></i> Send a Message</h2>
-                    <p>We'll get back to you within 24 hours.</p>
-                </div>
-                <div class="card-content">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }}">
-                                <i class="fas fa-{{ message.tags|yesno:'check-circle,exclamation-circle' }}"></i>
-                                {{ message }}
+        <div class="contact-main-section">
+            <div class="contact-grid">
+                <div class="contact-form-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-envelope"></i> Send Message</h2>
+                        <p>We'll get back to you within 24 hours</p>
+                    </div>
+                    <div class="card-content">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}">
+                                    <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %}"></i>
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <form method="post" class="contact-form" action="{% url 'contact' %}" id="contactForm">
+                            {% csrf_token %}
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="name" class="form-label">Full Name *</label>
+                                    <input type="text" id="name" name="name" class="form-input" required placeholder="Enter your full name">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="email" class="form-label">Email Address *</label>
+                                    <input type="email" id="email" name="email" class="form-input" required placeholder="Enter your email">
+                                </div>
                             </div>
-                        {% endfor %}
-                    {% endif %}
-                    <form action="{% url 'submit_feedback' %}" method="post" id="contactForm">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="name">Your Name</label>
-                            <input type="text" id="name" name="name" class="contact-input" placeholder="e.g., John Doe" required>
+
+                            <div class="form-group">
+                                <label for="subject" class="form-label">Subject *</label>
+                                <input type="text" id="subject" name="subject" class="form-input" required placeholder="What's this about?">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="message" class="form-label">Message *</label>
+                                <textarea id="message" name="message" class="form-textarea" rows="6" required placeholder="Tell us more about your inquiry..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn-primary contact-submit">
+                                <i class="fas fa-paper-plane"></i>
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="contact-info-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-info-circle"></i> Contact Information</h2>
+                        <p>Multiple ways to reach us</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="contact-methods">
+                            <div class="contact-method">
+                                <div class="method-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="method-content">
+                                    <h4>Email Support</h4>
+                                    <p>lamlaaiteam@gmail.com</p>
+                                    <small>We typically respond within 24 hours</small>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-method">
+                                <div class="method-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="method-content">
+                                    <h4>Response Time</h4>
+                                    <p>24-48 hours</p>
+                                    <small>Monday to Saturday, 9 AM - 6 PM UTC</small>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-method">
+                                <div class="method-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                </div>
+                                <div class="method-content">
+                                    <h4>FAQ Section</h4>
+                                    <p>Find quick answers</p>
+                                    <a href="#faq" class="text-yellow">View FAQ →</a>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" name="email" class="contact-input" placeholder="e.g., example@domain.com" required>
+
+                        <div class="contact-tips">
+                            <h4><i class="fas fa-lightbulb"></i> Before Contacting Us</h4>
+                            <ul>
+                                <li>Check our FAQ section for common questions</li>
+                                <li>Make sure you've tried our troubleshooting guide</li>
+                                <li>Include relevant details in your message</li>
+                                <li>Provide screenshots if reporting an issue</li>
+                            </ul>
                         </div>
-                        <div class="form-group">
-                            <label for="subject">Subject</label>
-                            <input type="text" id="subject" name="subject" class="contact-input" placeholder="e.g., Question about Quizzes" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Your Message</label>
-                            <textarea id="message" name="message" rows="5" class="contact-textarea" placeholder="Type your message here..." required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary contact-submit-btn">Send Message</button>
-                    </form>
+                    </div>
                 </div>
             </div>
-            <div class="contact-info-card animate-in" data-delay="0.2s">
-                <div class="info-item">
-                    <i class="fas fa-map-marker-alt info-icon"></i>
-                    <div class="info-content">
-                        <h3>Our Location</h3>
-                        <p>123 AI Learning Lane, Accra, Ghana</p>
-                    </div>
+
+            <div class="social-section">
+                <div class="social-header">
+                    <h2>Connect With Us</h2>
+                    <p>Follow us on social media for updates, tips, and community</p>
                 </div>
-                <div class="info-item">
-                    <i class="fas fa-envelope info-icon"></i>
-                    <div class="info-content">
-                        <h3>Email Us</h3>
-                        <p>support@lamla.ai</p>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <i class="fas fa-phone-alt info-icon"></i>
-                    <div class="info-content">
-                        <h3>Call Us</h3>
-                        <p>+233 55 555 5555</p>
-                    </div>
+                
+                <div class="social-grid">
+                    <a href="https://x.com/lamla_i" class="social-card">
+                        <div class="social-icon">
+                            <i class="fab fa-twitter"></i>
+                        </div>
+                        <div class="social-content">
+                            <h4>Twitter</h4>
+                            <p>Follow for updates and tips</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://linkedin.com/company/lamla-ai" class="social-card">
+                        <div class="social-icon">
+                            <i class="fab fa-linkedin"></i>
+                        </div>
+                        <div class="social-content">
+                            <h4>LinkedIn</h4>
+                            <p>Professional updates and insights</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://instagram.com/lamla.io" class="social-card">
+                        <div class="social-icon">
+                            <i class="fab fa-instagram"></i>
+                        </div>
+                        <div class="social-content">
+                            <h4>Instagram</h4>
+                            <p>Stay Updated</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://www.facebook.com/share/16pmyhCiUM/" class="social-card">
+                        <div class="social-icon">
+                            <i class="fab fa-facebook"></i>
+                        </div>
+                        <div class="social-content">
+                            <h4>Facebook</h4>
+                            <p>Join our community</p>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
-    </section>
-</main>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_body %}
