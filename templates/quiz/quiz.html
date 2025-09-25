@@ -1,119 +1,200 @@
-{% extends "base.html" %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Practice Quiz | Lamla.ai </title>
 
-{% block chatbot %}{% endblock %}
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
 
-{% block extra_head %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/quiz.css' %}">
-{% endblock %}
+  <style>
+    :root {
+      --primary-color: #FFD600;
+      --primary-dark: #E6C200;
+      --primary-light: #FFF3A0;
+      --secondary-color: #1a1a1a;
+      --text-primary: #f0f4f8;
+      --text-secondary: #a0aec0;
+      --text-muted: #718096;
+      --background-dark: #121212;
+      --background-gray: #1e1e1e;
+      --surface: #1e1e1e;
+      --border: #333333;
+      --border-light: #444444;
+      --navbar-height: 72px;
+      --shadow-navbar: 0 4px 20px rgba(0,0,0,0.5);
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
 
-{% block content %}
+    :root {
+      --quiz-page-gutter: 40px;
+      --quiz-max-width: 1200px;
+      --quiz-bg: var(--background-dark);
+      --quiz-text: var(--text-primary);
+      --quiz-card-bg: var(--surface);
+      --quiz-card-border: var(--border);
+      --quiz-primary: var(--primary-color);
+      --quiz-timer-red: #971b1bff;
+      --quiz-hide-bg: #333;
+      --quiz-hide-text: #fff;
+      --quiz-active-bg: #2a2a2a;
+    }
+
+    * { box-sizing: border-box; }
+    html,body { height:100%; margin:0; font-family:'Inter',sans-serif; background:var(--quiz-bg); color:var(--quiz-text); }
+
+    /* Navbar */
+    .main-header {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: var(--navbar-height);
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      box-shadow: var(--shadow-navbar);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 2000;
+    }
+    .header-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1400px; margin:0 auto; }
+    .logo { display:flex; align-items:center; gap:12px; text-decoration:none; font-size:1.5rem; font-weight:800; color:white; }
+    .logo-img { width:40px; height:40px; border-radius: var(--radius-sm); }
+
+    .page-spacer { height: var(--navbar-height); }
+
+    /* Quiz root */
+    .quiz-root {
+      width: min(var(--quiz-max-width), calc(100% - var(--quiz-page-gutter)));
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Timer bar */
+    .quiz-header {
+      display:flex; justify-content:space-between; align-items:center;
+      background: var(--quiz-timer-red); color:#fff;
+      padding: 10px 15px; border-radius: 6px;
+      font-weight: bold;
+    }
+    .quiz-hide-btn { background: var(--quiz-hide-bg); color: var(--quiz-hide-text); border:none; border-radius:4px; padding:4px 10px; cursor:pointer; }
+
+    /* Cards */
+    .quiz-card {
+      background: var(--quiz-card-bg);
+      border: 1px solid var(--quiz-card-border);
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+    }
+
+    .quiz-meta p { margin-bottom:5px; font-size:14px; color: var(--text-secondary); }
+
+    /* Options */
+    .quiz-options { list-style:none; padding:0; margin-top:15px; }
+    .quiz-options li { margin-bottom:10px; }
+    .quiz-options input[type="radio"] { display:none; }
+    .quiz-options label {
+      display:block; border:1px solid var(--quiz-card-border);
+      border-radius:6px; padding:10px 12px; cursor:pointer;
+      font-size:14px; color:var(--quiz-text); transition:all .2s;
+    }
+    .quiz-options label::before {
+      content:""; display:inline-block; width:16px; height:16px;
+      border:2px solid var(--text-secondary); border-radius:50%;
+      margin-right:10px; vertical-align:middle;
+    }
+    .quiz-options input[type="radio"]:checked + label {
+      border-color: var(--quiz-primary);
+      background: var(--quiz-active-bg);
+      font-weight:bold;
+    }
+    .quiz-options input[type="radio"]:checked + label::before {
+      background: var(--quiz-primary); border-color: var(--quiz-primary);
+    }
+
+    /* Nav buttons */
+    .quiz-nav { display:flex; justify-content:space-between; margin-top:20px; }
+    .quiz-nav button {
+      background:#2a2a2a; border:1px solid var(--quiz-card-border);
+      color:var(--text-primary);
+      padding:8px 12px; border-radius:6px; cursor:pointer;
+    }
+    .quiz-nav button:hover { background:#333; }
+
+    .brand-highlight {
+      display: block;
+      background: linear-gradient(135deg, var(--primary-color) 0%, #FFA500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+    }
+
+
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="header-container">
+      <a href="{% url 'home' %}" class="logo">
+        <img src="{% static 'img/lamla_logo.png' %}" alt="Lamla AI Logo" class="logo-img">
+        <span class="brand-highlight">Lamla.ai</span>
+      </a>
+      <nav class="main-nav"><ul class="nav-links"></ul></nav>
+    </div>
+  </header>
+
+  <div class="page-spacer"></div>
+
+  <div class="quiz-root">
     <div class="quiz-header">
-        <h1>AI Generated Quiz</h1>
-        <div class="quiz-info">
-            <span>Total Questions: {{ total_questions }}</span>
-            <span>MCQ: {{ mcq_count }}</span>
-            <span>Short Answer: {{ short_count }}</span>
-        </div>
+      <div class="quiz-timer">
+        <span>Time left</span>
+        <span id="quiz-time">{{ quiz_time }}:00</span>
+      </div>
+      <button class="quiz-hide-btn">Hide</button>
     </div>
 
-    <div class="main-content">
-        <div class="timer-container">
-            <div class="time-left">Time left</div>
-            <div class="timer" id="timer">{{ quiz_time }}:00</div>
-            <button class="hide-timer-btn" id="hide-timer">Hide</button>
-        </div>
-        
-        <!-- MCQ Questions Container -->
-        <div id="mcq-questions-container" class="questions-container">
-            {% for question in questions.mcq_questions %}
-            <div class="quiz-question-card question-item" data-question-type="mcq" data-question-id="{{ forloop.counter0 }}" 
-                 style="display: {% if forloop.first %}block{% else %}none{% endif %};">
-                <div class="question-header">
-                    <div class="question-number">Question <span class="current-question">{{ forloop.counter }}</span></div>
-                    <div class="question-status" data-status="unanswered">Not yet answered</div>
-                    <div class="question-status">Marked out of 1.00</div>
-                </div>
-                <div class="flag-question" data-flagged="false">
-                    <i class="far fa-flag flag-icon"></i> <span class="flag-text">Flag question</span>
-                </div>
-                <div class="question-content">
-                    <div class="question-text">{{ question.question }}</div>
-                </div>
-                <div class="select-one-prompt">Select one:</div>
-                <ul class="options-list">
-                    {% for option in question.options %}
-                    <li class="option-item">
-                        <input type="radio" name="question-{{ forloop.parentloop.counter0 }}" 
-                               value="{{ option|first }}" id="opt-{{ forloop.parentloop.counter0 }}-{{ forloop.counter }}">
-                        <label for="opt-{{ forloop.parentloop.counter0 }}-{{ forloop.counter }}">{{ option }}</label>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endfor %}
+    {% if questions.mcq_questions %}
+      {% with question=questions.mcq_questions.0 %}
+        <div class="quiz-card quiz-meta">
+          <p><strong>Question <span>{{ forloop.counter }}</span></strong></p>
+          <p class="quiz-status">Not yet answered</p>
+          <p>Marked out of 1.00</p>
+          <a href="#" class="quiz-flag">Flag question</a>
         </div>
 
-        <!-- Short Answer Questions Container -->
-        <div id="short-questions-container" class="questions-container">
-            {% for question in questions.short_questions %}
-            <div class="quiz-question-card question-item" data-question-type="short" data-question-id="{{ forloop.counter0|add:questions.mcq_questions|length }}" 
-                 style="display: none;">
-                <div class="question-header">
-                    <div class="question-number">Question <span class="current-question">{{ forloop.counter|add:questions.mcq_questions|length }}</span></div>
-                    <div class="question-status" data-status="unanswered">Not yet answered</div>
-                    <div class="question-status">Marked out of 1.00</div>
-                </div>
-                <div class="flag-question" data-flagged="false">
-                    <i class="far fa-flag flag-icon"></i> <span class="flag-text">Flag question</span>
-                </div>
-                <div class="question-content">
-                    <div class="question-text">{{ question.question }}</div>
-                </div>
-                <div class="short-answer-prompt">Type your answer:</div>
-                <textarea class="short-answer-input" placeholder="Enter your answer here..." 
-                         data-question-id="{{ forloop.counter0|add:questions.mcq_questions|length }}"></textarea>
-            </div>
-            {% endfor %}
+        <div class="quiz-card">
+          <div class="quiz-body">
+            {{ question.question|safe }}
+            <p><strong>Select one:</strong></p>
+            <ul class="quiz-options">
+              {% for option in question.options %}
+              <li>
+                <input type="radio" id="opt-{{ forloop.counter }}" name="quiz-q" value="{{ option|first }}">
+                <label for="opt-{{ forloop.counter }}">{{ option }}</label>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
+      {% endwith %}
+    {% else %}
+      <div class="quiz-card"><div class="quiz-body">No questions available.</div></div>
+    {% endif %}
+
+    <div class="quiz-nav">
+      <button id="quiz-prev">◀ Previous</button>
+      <button id="quiz-next">Next ▶</button>
     </div>
+  </div>
 
-    <div class="bottom-nav-bar">
-        <a href="#" class="nav-item" id="question-list-btn">
-            <div class="nav-icon-circle"><i class="fas fa-list-ul"></i></div>
-            <span>Question List</span>
-        </a>
-        <button class="prev-next-btn prev" id="prev-btn" disabled>
-            <i class="fas fa-chevron-left"></i>
-            <span>Previous</span>
-        </button>
-        <button class="prev-next-btn next" id="next-btn">
-            <span>Next</span>
-            <i class="fas fa-chevron-right"></i>
-        </button>
-        <button class="prev-next-btn submit" id="submit-btn">
-            <span>Submit Quiz</span>
-        </button>
-    </div>
-
-    <!-- Question List Modal -->
-    <div id="question-list-modal" class="modal">
-        <div class="modal-content">
-            <button id="close-question-list" class="close-modal">&times;</button>
-            <h3>Question List</h3>
-            <div id="question-list-numbers" class="question-grid"></div>
-        </div>
-    </div>
-{% endblock %}
-
-{% block extra_body %}
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
-    <input type="hidden" id="total_questions" value="{{ total_questions }}">
-    <input type="hidden" id="quiz_time" value="{{ quiz_time }}">
-    {{ questions.mcq_questions|json_script:"mcq-questions-json" }}
-    {{ questions.short_questions|json_script:"short-questions-json" }}
-    <script src="{% static 'js/quiz.js' %}"></script>
-{% endblock %}
+  <script src="{% static 'js/quiz.js' %}"></script>
+</body>
+</html>
