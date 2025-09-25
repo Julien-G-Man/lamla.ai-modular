@@ -185,7 +185,7 @@
 
 .form-hint {
     font-size: 0.9rem;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     gap: 8px;

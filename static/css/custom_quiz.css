@@ -774,6 +774,43 @@ body {
     font-weight: 600;
 }
 
+/* New Character Count for Extracted Text Display */
+.character-count {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-align: right;
+}
+
+.character-count #charCount {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.text-input-container {
+    position: relative;
+}
+
+/* Improve textarea styling */
+.tab-content textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px rgba(255, 214, 0, 0.12);
+    transform: translateY(-1px);
+}
+
+/* Success and error states for file upload */
+.file-name-display.success {
+    color: var(--enactus-success-green);
+    border-color: rgba(3, 144, 62, 0.3);
+}
+
+.file-name-display.error {
+    color: var(--enactus-error-red);
+    border-color: rgba(189, 36, 19, 0.3);
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 768px) {
     .page-wrapper { padding: 20px 16px; margin-top: 64px; }

@@ -11,6 +11,7 @@
 {% block content %}
 <div class="page-wrapper">
     <div class="quiz-card-container" role="main">
+        <input type="hidden" id="extractTextURL" value="{% url 'ajax_extract_text' %}">
         <h1 class="main-page-title">🧠 Quiz Mode</h1>
         <p class="main-page-description">
             Upload your study materials or paste content to create customized quiz questions with AI.
@@ -58,22 +59,22 @@
 
             <!-- Tabs -->
             <div class="tab-group" role="tablist" aria-label="Content input mode">
-                <button type="button" role="tab" aria-selected="true" class="tab active" id="textTab">
+                <button type="button" role="tab" aria-selected="true" class="tab active" id="textTab" data-tab="textContent">
                     <i class="fas fa-keyboard" aria-hidden="true"></i> Enter Text
                 </button>
-                <button type="button" role="tab" aria-selected="false" class="tab" id="fileTab">
+                <button type="button" role="tab" aria-selected="false" class="tab" id="fileTab" data-tab="fileContent">
                     <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i> Upload File
                 </button>
             </div>
 
             <!-- Text content -->
-            <div class="tab-content" id="textContent" role="tabpanel" aria-labelledby="textTab">
+            <div class="tab-content active" id="textContent" role="tabpanel" aria-labelledby="textTab">
                 <textarea name="extractedText" id="studyText" placeholder="Paste your study materials here..." aria-label="Paste study materials"></textarea>
             </div>
 
             <!-- File content -->
             <div class="tab-content" id="fileContent" role="tabpanel" aria-labelledby="fileTab" style="display:none;">
-                <div class="upload-zone">
+                <div class="upload-zone" id="uploadZone">
                     <div class="upload-icon" aria-hidden="true">📖</div>
                     <div class="upload-text">Upload your study materials</div>
                     <div class="upload-description">Upload PDF, DOCX, PPT, PPTX, or text files to analyze</div>
@@ -129,49 +130,17 @@
         </div>
 
         <!-- Error message -->
-        {% if error_message %}
-            <div class="api-error-message" role="alert">{{ error_message }}</div>
-        {% endif %}
-
-        <!-- Results -->
-        {% if quiz_results %}
-            <div class="quiz-results-container" aria-live="polite">
-                <h3 class="results-title">Generated Questions</h3>
-
-                {% if quiz_results.mcq_questions %}
-                    <h4 class="question-type-title">
-                        <i class="fas fa-list-ul"></i> Multiple Choice Questions
-                    </h4>
-                    <ol class="question-list">
-                        {% for q in quiz_results.mcq_questions %}
-                            <li class="question-item">
-                                <div class="question-text"><b>{{ q.question }}</b></div>
-                                <ul class="options-list">
-                                    {% for opt in q.options %}
-                                        <li>{{ opt }}</li>
-                                    {% endfor %}
-                                </ul>
-                                <div class="question-answer">Answer: <b>{{ q.answer }}</b></div>
-                            </li>
-                        {% endfor %}
-                    </ol>
-                {% endif %}
-
-                {% if quiz_results.short_questions %}
-                    <h4 class="question-type-title">
-                        <i class="fas fa-pen"></i> Short Answer Questions
-                    </h4>
-                    <ol class="question-list">
-                        {% for q in quiz_results.short_questions %}
-                            <li class="question-item">
-                                <div class="question-text"><b>{{ q.question }}</b></div>
-                                <div class="question-answer">Answer: <b>{{ q.answer }}</b></div>
-                            </li>
-                        {% endfor %}
-                    </ol>
-                {% endif %}
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="api-error-message" role="alert">
+                        <i class="fas fa-exclamation-circle"></i> {{ message }}
+                    </div>
+                {% endfor %}
             </div>
         {% endif %}
+
+        <!-- Results section removed since it should be on quiz_results page -->
     </div>
 </div>
 

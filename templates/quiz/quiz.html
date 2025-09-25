@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block chatbot %}{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/quiz.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="quiz-header">
+        <h1>AI Generated Quiz</h1>
+        <div class="quiz-info">
+            <span>Total Questions: {{ total_questions }}</span>
+            <span>MCQ: {{ mcq_count }}</span>
+            <span>Short Answer: {{ short_count }}</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="timer-container">
+            <div class="time-left">Time left</div>
+            <div class="timer" id="timer">{{ quiz_time }}:00</div>
+            <button class="hide-timer-btn" id="hide-timer">Hide</button>
+        </div>
+        
+        <!-- MCQ Questions Container -->
+        <div id="mcq-questions-container" class="questions-container">
+            {% for question in questions.mcq_questions %}
+            <div class="quiz-question-card question-item" data-question-type="mcq" data-question-id="{{ forloop.counter0 }}" 
+                 style="display: {% if forloop.first %}block{% else %}none{% endif %};">
+                <div class="question-header">
+                    <div class="question-number">Question <span class="current-question">{{ forloop.counter }}</span></div>
+                    <div class="question-status" data-status="unanswered">Not yet answered</div>
+                    <div class="question-status">Marked out of 1.00</div>
+                </div>
+                <div class="flag-question" data-flagged="false">
+                    <i class="far fa-flag flag-icon"></i> <span class="flag-text">Flag question</span>
+                </div>
+                <div class="question-content">
+                    <div class="question-text">{{ question.question }}</div>
+                </div>
+                <div class="select-one-prompt">Select one:</div>
+                <ul class="options-list">
+                    {% for option in question.options %}
+                    <li class="option-item">
+                        <input type="radio" name="question-{{ forloop.parentloop.counter0 }}" 
+                               value="{{ option|first }}" id="opt-{{ forloop.parentloop.counter0 }}-{{ forloop.counter }}">
+                        <label for="opt-{{ forloop.parentloop.counter0 }}-{{ forloop.counter }}">{{ option }}</label>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Short Answer Questions Container -->
+        <div id="short-questions-container" class="questions-container">
+            {% for question in questions.short_questions %}
+            <div class="quiz-question-card question-item" data-question-type="short" data-question-id="{{ forloop.counter0|add:questions.mcq_questions|length }}" 
+                 style="display: none;">
+                <div class="question-header">
+                    <div class="question-number">Question <span class="current-question">{{ forloop.counter|add:questions.mcq_questions|length }}</span></div>
+                    <div class="question-status" data-status="unanswered">Not yet answered</div>
+                    <div class="question-status">Marked out of 1.00</div>
+                </div>
+                <div class="flag-question" data-flagged="false">
+                    <i class="far fa-flag flag-icon"></i> <span class="flag-text">Flag question</span>
+                </div>
+                <div class="question-content">
+                    <div class="question-text">{{ question.question }}</div>
+                </div>
+                <div class="short-answer-prompt">Type your answer:</div>
+                <textarea class="short-answer-input" placeholder="Enter your answer here..." 
+                         data-question-id="{{ forloop.counter0|add:questions.mcq_questions|length }}"></textarea>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="bottom-nav-bar">
+        <a href="#" class="nav-item" id="question-list-btn">
+            <div class="nav-icon-circle"><i class="fas fa-list-ul"></i></div>
+            <span>Question List</span>
+        </a>
+        <button class="prev-next-btn prev" id="prev-btn" disabled>
+            <i class="fas fa-chevron-left"></i>
+            <span>Previous</span>
+        </button>
+        <button class="prev-next-btn next" id="next-btn">
+            <span>Next</span>
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <button class="prev-next-btn submit" id="submit-btn">
+            <span>Submit Quiz</span>
+        </button>
+    </div>
+
+    <!-- Question List Modal -->
+    <div id="question-list-modal" class="modal">
+        <div class="modal-content">
+            <button id="close-question-list" class="close-modal">&times;</button>
+            <h3>Question List</h3>
+            <div id="question-list-numbers" class="question-grid"></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_body %}
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" id="total_questions" value="{{ total_questions }}">
+    <input type="hidden" id="quiz_time" value="{{ quiz_time }}">
+    {{ questions.mcq_questions|json_script:"mcq-questions-json" }}
+    {{ questions.short_questions|json_script:"short-questions-json" }}
+    <script src="{% static 'js/quiz.js' %}"></script>
+{% endblock %}
