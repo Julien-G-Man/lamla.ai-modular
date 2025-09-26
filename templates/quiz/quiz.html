@@ -2,14 +2,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Practice Quiz | Lamla.ai </title>
-
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Quiz | Lamla.ai</title>
 
   <style>
+    /**********************
+     * Base navbar variables & core (from base.css)
+     **********************/
     :root {
       --primary-color: #FFD600;
       --primary-dark: #E6C200;
@@ -23,177 +23,296 @@
       --surface: #1e1e1e;
       --border: #333333;
       --border-light: #444444;
+      --sidebar-width: 280px;
       --navbar-height: 72px;
-      --shadow-navbar: 0 4px 20px rgba(0,0,0,0.5);
+      --shadow-sm: 0 1px 3px rgba(255,255,255,0.05), 0 1px 2px rgba(255,255,255,0.03);
+      --shadow-md: 0 4px 6px rgba(255,255,255,0.07), 0 2px 4px rgba(255,255,255,0.06);
+      --shadow-lg: 0 10px 15px rgba(255,255,255,0.1), 0 4px 6px rgba(255,255,255,0.05);
+      --shadow-xl: 0 20px 25px rgba(255,255,255,0.1), 0 10px 10px rgba(255,255,255,0.04);
+      --shadow-navbar: 0 4px 20px rgba(0, 0, 0, 0.5);
+      --shadow-sidebar: 4px 0 20px rgba(0, 0, 0, 0.5);
       --radius-sm: 6px;
       --radius-md: 12px;
-      --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+      /* Quiz-specific sensible defaults (override base primary where needed) */
+      --bg: #0f1112;
+      --card: #141618;
+      --muted: #9aa3ae;
+      --accent: #ce0b0b; /* preserved red accent used across quiz UI */
+      --ok: #ffffff;
+      --pill: #2a2a2a;
+      --text: #eef2f5;
+      --border-quiz: rgba(255,255,255,0.03);
     }
 
-    :root {
-      --quiz-page-gutter: 40px;
-      --quiz-max-width: 1200px;
-      --quiz-bg: var(--background-dark);
-      --quiz-text: var(--text-primary);
-      --quiz-card-bg: var(--surface);
-      --quiz-card-border: var(--border);
-      --quiz-primary: var(--primary-color);
-      --quiz-timer-red: #971b1bff;
-      --quiz-hide-bg: #333;
-      --quiz-hide-text: #fff;
-      --quiz-active-bg: #2a2a2a;
-    }
+    /* Basic resets */
+    * { box-sizing: border-box; margin:0; padding:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    html,body{min-height:100%; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+    /* ensure content starts below fixed navbar + gap so timer is never overlapped */
+    body{ padding-top: calc(var(--navbar-height) + 22px); }
 
-    * { box-sizing: border-box; }
-    html,body { height:100%; margin:0; font-family:'Inter',sans-serif; background:var(--quiz-bg); color:var(--quiz-text); }
+    /* Site wrapper (keeps base layout compatibility if you later embed) */
+    .site-wrapper { display:flex; flex-direction:column; min-height:100vh; }
 
-    /* Navbar */
+    /* NAVBAR (copied from base + small additions for this self-contained template) */
     .main-header {
       position: fixed;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       width: 100%;
       height: var(--navbar-height);
-      background: rgba(0,0,0,0.6);
+      background: rgba(0, 0, 0, 0.2);
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: var(--shadow-navbar);
       display: flex;
       align-items: center;
+      justify-content: space-between;
       padding: 0 24px;
       z-index: 2000;
+      transition: var(--transition);
     }
-    .header-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1400px; margin:0 auto; }
-    .logo { display:flex; align-items:center; gap:12px; text-decoration:none; font-size:1.5rem; font-weight:800; color:white; }
-    .logo-img { width:40px; height:40px; border-radius: var(--radius-sm); }
-
-    .page-spacer { height: var(--navbar-height); }
-
-    /* Quiz root */
-    .quiz-root {
-      width: min(var(--quiz-max-width), calc(100% - var(--quiz-page-gutter)));
-      margin: 0 auto;
-      padding: 20px;
+    .header-container {
+      display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1400px; margin:0 auto;
     }
 
-    /* Timer bar */
-    .quiz-header {
-      display:flex; justify-content:space-between; align-items:center;
-      background: var(--quiz-timer-red); color:#fff;
-      padding: 10px 15px; border-radius: 6px;
-      font-weight: bold;
-    }
-    .quiz-hide-btn { background: var(--quiz-hide-bg); color: var(--quiz-hide-text); border:none; border-radius:4px; padding:4px 10px; cursor:pointer; }
+    .logo { display:flex; align-items:center; gap:12px; text-decoration:none; transition:var(--transition); font-size:1.1rem; font-weight:800; color:var(--text); letter-spacing:-0.5px; }
+    .logo:hover { transform:scale(1.02); }
+    .logo-img { width:40px; height:40px; border-radius:var(--radius-sm); box-shadow:var(--shadow-sm); object-fit:cover; }
 
-    /* Cards */
-    .quiz-card {
-      background: var(--quiz-card-bg);
-      border: 1px solid var(--quiz-card-border);
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 15px;
+    /* main-nav kept but no nav-links are injected (self-contained) */
+    .main-nav { display:flex; align-items:center; gap:12px; }
+    .nav-links { list-style:none; display:flex; gap:14px; margin:0; padding:0; align-items:center; }
+    .nav-links a { color:var(--text); text-decoration:none; padding:8px 12px; border-radius:8px; font-weight:600; font-size:0.98rem; }
+    .nav-links .btn-nav-cta { background:var(--primary-color); color:#111; padding:8px 12px; border-radius:8px; }
+    .nav-toggle { background:transparent; border:none; color:var(--text); font-size:1.1rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:8px; border-radius:8px; }
+    .nav-toggle:focus { outline:2px solid rgba(255,255,255,0.06); }
+
+    /**********************
+     * Quiz page styles (kept from your previous quiz template)
+     **********************/
+    .quiz-container{ max-width:980px; margin:0 auto; padding:0 12px; }
+
+    /* Timer header (sample sizing / accent) */
+    .top-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background: var(--accent);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 6px;
+      font-weight:700;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+      margin-top: 8px; /* small gap under fixed navbar */
+      z-index: 1000;
+    }
+    .timer { display:flex; align-items:center; gap:8px; font-size:14px; }
+    .timer .time { font-variant-numeric: tabular-nums; }
+    .timer .time.quiz-time--hidden { visibility:hidden; opacity:0; }
+
+    .hide-btn {
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight:600;
     }
 
-    .quiz-meta p { margin-bottom:5px; font-size:14px; color: var(--text-secondary); }
+    /* Meta card above question */
+    .meta-card {
+      background: var(--card);
+      border:1px solid var(--border-quiz);
+      border-radius:12px;
+      padding:14px 16px;
+      margin-top:15px;
+      color:var(--text);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+    }
+    .meta-card p { margin-bottom:6px; color:var(--muted); font-size:14px; }
+    .meta-card p strong { color:var(--text); font-weight:700; }
+    .flag { display:inline-block; margin-top:6px; color:var(--accent); text-decoration:none; font-size:14px; }
 
-    /* Options */
-    .quiz-options { list-style:none; padding:0; margin-top:15px; }
-    .quiz-options li { margin-bottom:10px; }
-    .quiz-options input[type="radio"] { display:none; }
-    .quiz-options label {
-      display:block; border:1px solid var(--quiz-card-border);
-      border-radius:6px; padding:10px 12px; cursor:pointer;
-      font-size:14px; color:var(--quiz-text); transition:all .2s;
+    /* Question card */
+    .question-card {
+      background: var(--card);
+      border:1px solid var(--border-quiz);
+      border-radius:12px;
+      padding:18px;
+      margin-top:15px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.45);
     }
-    .quiz-options label::before {
-      content:""; display:inline-block; width:16px; height:16px;
-      border:2px solid var(--text-secondary); border-radius:50%;
-      margin-right:10px; vertical-align:middle;
-    }
-    .quiz-options input[type="radio"]:checked + label {
-      border-color: var(--quiz-primary);
-      background: var(--quiz-active-bg);
-      font-weight:bold;
-    }
-    .quiz-options input[type="radio"]:checked + label::before {
-      background: var(--quiz-primary); border-color: var(--quiz-primary);
-    }
+    .question-number { color: var(--muted); font-weight:600; margin-bottom:6px; font-size:14px; }
+    .question-body { font-size:15px; line-height:1.6; color:var(--text); margin-bottom:12px; }
 
-    /* Nav buttons */
-    .quiz-nav { display:flex; justify-content:space-between; margin-top:20px; }
-    .quiz-nav button {
-      background:#2a2a2a; border:1px solid var(--quiz-card-border);
-      color:var(--text-primary);
-      padding:8px 12px; border-radius:6px; cursor:pointer;
+    /* Options (boxed labels, custom radio pseudo element) */
+    .options { list-style:none; margin:0; padding:0; margin-top:12px; }
+    .options li { margin-bottom:10px; }
+    .options input[type="radio"] { display:none; }
+    .options label {
+      display:block;
+      border:1px solid rgba(255,255,255,0.03);
+      border-radius:8px;
+      padding:12px 14px;
+      cursor:pointer;
+      font-size:14px;
+      transition: all .16s ease;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+      color:var(--text);
     }
-    .quiz-nav button:hover { background:#333; }
+    .options label:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.07); }
 
-    .brand-highlight {
-      display: block;
-      background: linear-gradient(135deg, var(--primary-color) 0%, #FFA500 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      position: relative;
+    .options label::before {
+      content: "";
+      display:inline-block;
+      width:16px;
+      height:16px;
+      border:2px solid rgba(255,255,255,0.18);
+      border-radius:50%;
+      margin-right:12px;
+      vertical-align:middle;
+      transition: all .14s ease;
     }
-  </style> 
+    .options input[type="radio"]:checked + label,
+    .options input[type="radio"]:checked + label span { font-weight:700; }
+    .options input[type="radio"]:checked + label::before { background: var(--ok); border-color: var(--ok); box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
+
+    /* small meta row */
+    .quiz-meta { display:flex; gap:8px; align-items:center; margin-top:12px; }
+    .flag-btn { background:transparent; border:1px solid rgba(255,255,255,0.04); padding:6px 10px; border-radius:999px; cursor:pointer; color:var(--text); font-weight:600; }
+    .flagged-indicator { display:inline-block;width:10px;height:10px;border-radius:50%;background:transparent;margin-left:6px;vertical-align:middle; }
+    .flagged-indicator.flagged { background:var(--accent); }
+
+    /* nav buttons */
+    .nav { display:flex; justify-content:space-between; margin-top:20px; gap:12px; }
+    .btn { background:var(--pill); color:var(--text); padding:10px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.03); cursor:pointer; font-weight:600; }
+    .btn.primary { background:var(--ok); color:#061416; }
+
+    /* Floating button & panel */
+    .float-btn{ position:fixed; right:18px; bottom:18px; width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--pill); color:var(--text); box-shadow:0 6px 20px rgba(0,0,0,0.6); cursor:pointer; border:none; z-index:1000;}
+    .question-panel{ position:fixed; right:-320px; top:0; height:100%; width:300px; background:#0e1112; padding:18px; transition:right .28s ease; box-shadow:-6px 0 18px rgba(0,0,0,0.6); overflow:auto; z-index:999; }
+    .question-panel.active{ right:0; }
+    .question-panel h3{ margin-top:0; color:var(--muted); margin-bottom:8px; }
+    .question-list{ display:flex; flex-wrap:wrap; gap:8px; }
+    .question-list button{ width:44px; height:44px; border-radius:50%; border:none; background:#202426; color:var(--text); cursor:pointer; }
+    .question-list button.answered{ background:var(--ok); color:#061416; }
+    .question-list button.flagged{ background:var(--accent); color:#061416; }
+    .question-list button.current{ outline:3px solid rgba(255,255,255,0.04); }
+
+    /* responsive tweaks */
+    @media (max-width: 720px) {
+      body { padding-top: calc(var(--navbar-height) + 14px); }
+      .main-header { padding: 0 12px; }
+      .quiz-container { padding: 0 10px; }
+      .question-panel { width: 100%; right: -100%; }
+      .question-panel.active { right: 0; }
+    }
+  </style>
 </head>
-
 <body>
-  <header class="main-header">
-    <div class="header-container">
-      <a href="{% url 'home' %}" class="logo">
-        <img src="{% static 'img/lamla_logo.png' %}" alt="Lamla AI Logo" class="logo-img">
-        <span class="brand-highlight">Lamla.ai</span>
-      </a>
-      <nav class="main-nav"><ul class="nav-links"></ul></nav>
-    </div>
-  </header>
+  <div class="site-wrapper">
+    <!-- NAVBAR (self-contained, no navlinks injected) -->
+    <header class="main-header">
+      <div class="header-container">
+        <a href="{% url 'home' %}" class="logo" aria-label="Lamla.ai home">
+          <img src="{% static 'img/lamla_logo.png' %}" alt="Lamla AI Logo" class="logo-img">
+          <span class="brand-highlight">Lamla.ai</span>
+        </a>
 
-  <div class="page-spacer"></div>
+        <!-- keep nav container present but empty (self-contained) -->
+        <nav class="main-nav" id="main-nav" aria-label="Main navigation">
+          <!-- No links here because you requested self-contained navbar -->
+        </nav>
 
-  <div class="quiz-root">
-    <div class="quiz-header">
-      <div class="quiz-timer">
-        <span>Time left</span>
-        <span id="quiz-time">{{ quiz_time }}:00</span>
+        <!-- nav toggle (kept for consistency in layout & future use) -->
+        <button class="nav-toggle" id="nav-toggle" aria-label="toggle navigation">
+          <i class="fas fa-bars" aria-hidden="true"></i>
+        </button>
       </div>
-      <button class="quiz-hide-btn">Hide</button>
-    </div>
+    </header>
 
-    {% if questions.mcq_questions %}
-      {% with question=questions.mcq_questions.0 %}
-        <div class="quiz-card quiz-meta">
-          <p><strong>Question <span>{{ forloop.counter }}</span></strong></p>
-          <p class="quiz-status">Not yet answered</p>
-          <p>Marked out of 1.00</p>
-          <a href="#" class="quiz-flag">Flag question</a>
+    <!-- MAIN CONTENT -->
+    <main class="main-content" role="main">
+      <div class="quiz-container" id="quiz-root">
+
+        <!-- Top timer header (dynamic time displayed by JS) -->
+        <div class="top-header" role="banner" aria-label="Exam timer">
+          <div class="timer" aria-live="polite">
+            <span>Time left</span>
+            <span class="time" id="timer-display">0:00:00</span>
+          </div>
+          <button class="hide-btn" id="toggle-timer" aria-pressed="false">Hide</button>
         </div>
 
-        <div class="quiz-card">
-          <div class="quiz-body">
-            {{ question.question|safe }}
-            <p><strong>Select one:</strong></p>
-            <ul class="quiz-options">
-              {% for option in question.options %}
-              <li>
-                <input type="radio" id="opt-{{ forloop.counter }}" name="quiz-q" value="{{ option|first }}">
-                <label for="opt-{{ forloop.counter }}">{{ option }}</label>
-              </li>
-              {% endfor %}
-            </ul>
+        <!-- Meta Card -->
+        <div class="meta-card" id="meta-card">
+          <p><strong id="meta-question-number">Question 1</strong></p>
+          <p id="meta-status">Not yet answered</p>
+          <p id="meta-marked">Marked out of 1.00</p>
+          <a href="#" class="flag" id="meta-flag">Flag question</a>
+        </div>
+
+        <!-- Main question card -->
+        <div id="question-card" class="question-card" aria-live="polite" role="region" aria-label="Question card">
+          <div class="question-number" id="question-number">Question</div>
+          <div class="question-body" id="question-text">Loading…</div>
+
+          <!-- Options will be rendered here by JS -->
+          <ul class="options" id="options-list" aria-label="Answer choices"></ul>
+
+          <div class="quiz-meta">
+            <button class="flag-btn" id="toggle-flag" aria-pressed="false">Flag question <span class="flagged-indicator" id="flag-indicator"></span></button>
+            <div style="flex:1"></div>
+            <div class="muted" id="question-status">Not answered</div>
+          </div>
+
+          <div class="nav" style="margin-top:16px;">
+            <button class="btn" id="quiz-prev" aria-label="Previous question" disabled>◀ Previous</button>
+
+            <div style="display:flex; gap:8px;">
+              <button class="btn primary" id="quiz-next" aria-label="Next question">Next ▶</button>
+            </div>
           </div>
         </div>
-      {% endwith %}
-    {% else %}
-      <div class="quiz-card"><div class="quiz-body">No questions available.</div></div>
-    {% endif %}
 
-    <div class="quiz-nav">
-      <button id="quiz-prev">◀ Previous</button>
-      <button id="quiz-next">Next ▶</button>
-    </div>
+        <div id="no-questions" class="question-card" style="display:none; margin-top:14px;">
+          <div class="question-body">No questions available. Please generate a quiz first.</div>
+        </div>
+
+        <!-- hidden values for JS -->
+        <input type="hidden" name="csrfmiddlewaretoken" id="csrf-token" value="{{ csrf_token }}">
+        <input type="hidden" id="quiz_time" value="{{ quiz_time }}">
+        <input type="hidden" id="quiz-results-url" value="{% url 'quiz_results' %}">
+
+        <!-- JSON question payloads inserted by server -->
+        {{ questions.mcq_questions|default:"[]"|json_script:"mcq-questions-json" }}
+        {{ questions.short_questions|default:"[]"|json_script:"short-questions-json" }}
+        
+      </div>
+
+      <!-- Floating button -->
+      <button class="float-btn" id="open-panel" title="Open question navigator" aria-controls="question-panel">☰</button>
+
+      <!-- Question navigator -->
+      <aside class="question-panel" id="question-panel" aria-hidden="true" aria-label="Question navigator">
+        <h3>Questions</h3>
+        <div class="question-list" id="question-list" role="list"></div>
+        <div style="margin-top:18px" class="muted">Keyboard: ← previous, → next, Space toggles flag</div>
+      </aside>
+    </main>
   </div>
 
+  <!-- keep script link to your existing quiz engine -->
   <script src="{% static 'js/quiz.js' %}"></script>
+  <!-- font-awesome used by nav icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </body>
 </html>

@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('slide_file', file);
         
         // Get the correct URL - FIXED: Use the correct path with /practice/
-        const extractTextUrl = '/practice/ajax/extract-text/';
+        const extractTextUrl = document.getElementById('extractTextURL').value;
         
         console.log('Extracting text from file:', file.name, 'Size:', file.size, 'Type:', file.type);
         console.log('Using URL:', extractTextUrl);

@@ -131,6 +131,7 @@ Requirements:
     def _call_azure_openai_api(self, prompt: str) -> str:
         """Call Azure OpenAI API"""
         try:
+            url = self.azure_openai_endpoint
             headers = {
                 'Content-Type': 'application/json',
                 'api-key': self.azure_openai_api_key
@@ -144,11 +145,17 @@ Requirements:
                 "temperature": 0.7
             }
             
-            logger.info(f"Calling Azure OpenAI with endpoint: {self.azure_openai_endpoint}")
+            logger.info(f"Calling Azure OpenAI with endpoint: {url}")
             response = requests.post(self.azure_openai_endpoint, headers=headers, json=payload, timeout=120)
             response.raise_for_status()
+            logger.error(f"Azure raw response: {response.text}")
             result = response.json()
-            return result['choices'][0]['message']['content']
+            
+            if "choices" in result and len(result["choices"]) > 0:
+                return result["choices"][0]["message"]["content"]
+            else:
+                raise ValueError(f"Unexpected Azure response: {result}")
+            
         except Exception as e:
             logger.error(f"Azure OpenAI API error: {e}")
             raise
@@ -261,7 +268,7 @@ Requirements:
         Generate questions from the provided text with multiple fallback options.
         """
         # Validate inputs
-        if not text or len(text.strip()) < 30:
+        if not text or len(text.strip()) < 10:
             logger.error("Text too short for question generation")
             return self._generate_fallback_questions(text, num_mcq, num_short)
         

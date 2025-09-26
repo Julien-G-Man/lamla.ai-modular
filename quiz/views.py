@@ -4,24 +4,12 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
-from django.conf import settings
-from django.views.decorators.http import require_POST, require_GET
-from django.db import transaction
-from django.utils import timezone
-from django.core.paginator import Paginator
-from django.db.models import Q, Prefetch
-from django.views.decorators.cache import cache_page
-from django.core.cache import cache
 from django.utils.decorators import method_decorator
 from allauth.account.views import LoginView as AllauthLoginView
 from allauth.account.adapter import DefaultAccountAdapter
 import json
 import logging
 import os
-import tempfile
-from datetime import datetime, timedelta
 from .models import (
     Question, QuestionCache, QuizSession
 )
@@ -203,12 +191,12 @@ def generate_questions(request):
         quiz_results = None
         try:
             logger.info("Calling generate_questions_from_text...")
-            quiz_results = generate_questions_from_text(
+            quiz_results = QuizService.generate_quiz(
                 study_text, 
                 num_mcq, 
                 num_short, 
-                subject=subject, 
-                difficulty=difficulty
+                subject, 
+                difficulty
             )
             logger.info(f"Quiz generation completed - Results keys: {quiz_results.keys() if quiz_results else 'None'}")
             
@@ -268,10 +256,14 @@ def generate_questions(request):
             })
         
         # Store questions in session
-        request.session['quiz_questions'] = quiz_results
+        request.session['quiz_questions'] = {
+            'mcq_questions': mcq_questions,
+            'short_questions': short_questions,
+        }
         request.session['quiz_time'] = quiz_time
         request.session['uploaded_file_name'] = uploaded_file_name
         request.session['quiz_subject'] = subject
+        request.session.modified = True
         
         # Clear previous results
         if 'quiz_results' in request.session:
@@ -298,10 +290,12 @@ def quiz(request):
     Renders the quiz page with questions from the session.
     """
     quiz_questions = request.session.get('quiz_questions', {})
+    print("SESSION QUESTIONS:", quiz_questions)
     quiz_time = request.session.get('quiz_time', 10)
     
     if not quiz_questions:
         messages.error(request, 'No quiz has been generated. Please create a quiz first.')
+        logger.info(f"Quiz questions in session: {quiz_questions}")
         return redirect('custom_quiz')
     
     # Validate quiz questions structure
