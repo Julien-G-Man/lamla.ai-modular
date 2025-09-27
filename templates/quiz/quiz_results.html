@@ -9,28 +9,40 @@
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
+    /* Define dark theme variables for easy management */
     :root {
-        --primary-color: #FFD600;
-        --primary-dark: #E6C200;
-        --secondary-color: #222;
-        --background-white: #fff;
-        --background-light: #f8fafc;
-        --text-primary: #1a1a1a;
-        --text-secondary: #4a5568;
-        --text-muted: #718096;
-        --border-light: #e2e8f0;
-        --success-green: #10b981;
-        --error-red: #ef4444;
-        --warning-orange: #f59e0b;
-        --info-blue: #3b82f6;
-        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
-        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        /* Primary/Accent Colors (Home Scheme) */
+        --primary-color: #FFD600; /* Yellow accent */
+        --primary-dark: #E6C200; /* Darker Yellow accent */
+        --secondary-color: #1a1a1a; /* Dark text on primary backgrounds (from home) */
+        
+        /* Dark Theme Backgrounds/Surfaces (New) */
+        --background-color: #121212; /* Deep background (from home) */
+        --surface: #1c1c1c; /* Card/Container background (from home) */
+        
+        /* Text Colors (Home Scheme) */
+        --text-primary: #ffffffff; /* Light text for headings/main info (from home) */
+        --text-secondary: #f0f0f0; /* Softer light text for descriptions (from home) */
+        --text-muted: #a5a5a5ff; /* Muted gray text (from home) */
+        
+        /* Borders and Utility */
+        --border-dark: #333; /* Dark separator/border (from home) */
+        --success-green: #4CAF50; /* Slightly brighter green for better dark contrast */
+        --error-red: #EF5350; /* Standard error red */
+        --warning-orange: #FFB300; /* Standard warning orange */
+        --info-blue: #FFD600; /* Standard info blue */
+
+        /* Dark Theme Shadows (from home) */
+        --shadow-sm-dark: 0 1px 3px rgba(0, 0, 0, 0.2);
+        --shadow-md-dark: 0 4px 6px rgba(0, 0, 0, 0.3);
+        --shadow-lg-dark: 0 10px 15px rgba(0, 0, 0, 0.4);
     }
 
     body {
         font-family: 'Poppins', sans-serif;
-        background-color: var(--background-light);
+        /* Use the deepest background color */
+        background-color: var(--background-color); 
+        color: var(--text-primary);
     }
     
     .results-container {
@@ -41,12 +53,15 @@
 
     /* --- Summary Card (Main Score) --- */
     .summary-card {
-        background-color: var(--background-white);
+        /* Use the surface color for cards */
+        background-color: var(--surface); 
         border-radius: 12px;
-        box-shadow: var(--shadow-lg);
+        /* Use the dark theme shadow */
+        box-shadow: var(--shadow-lg-dark); 
         padding: 30px;
         margin-bottom: 30px;
-        border-top: 5px solid var(--primary-color);
+        /* Keep the primary accent border top */
+        border-top: 5px solid var(--primary-color); 
         display: flex;
         flex-direction: column;
         gap: 20px;
@@ -60,12 +75,18 @@
     .summary-header h1 {
         font-size: 2.5rem;
         font-weight: 700;
-        color: var(--text-primary);
+        /* Use primary text color */
+        color: var(--primary-color); 
         margin-bottom: 5px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, #FFA500 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
     .summary-header p {
-        color: var(--text-secondary);
+        /* Use secondary text color */
+        color: var(--text-secondary); 
         font-size: 1.1rem;
     }
 
@@ -85,18 +106,21 @@
     .metric h2 {
         font-size: 2.5rem;
         font-weight: 800;
-        color: var(--success-green);
+        /* Metric score uses success green */
+        color: var(--success-green); 
         line-height: 1;
     }
 
     .metric p {
         font-size: 0.9rem;
-        color: var(--text-muted);
+        /* Metric labels use muted text */
+        color: var(--text-muted); 
         margin-top: 5px;
     }
 
     .progress-bar-container {
-        background-color: var(--border-light);
+        /* Use the dark border color for the track */
+        background-color: var(--border-dark); 
         border-radius: 8px;
         height: 12px;
         margin-top: 10px;
@@ -105,7 +129,8 @@
 
     .progress-bar {
         height: 100%;
-        background-color: var(--primary-color);
+        /* Use the primary color for the progress */
+        background-color: var(--primary-color); 
         width: 0%; 
         transition: width 1s ease-out;
         border-radius: 8px;
@@ -115,42 +140,121 @@
     .review-section h2 {
         font-size: 1.8rem;
         font-weight: 600;
-        color: var(--text-primary);
-        border-bottom: 2px solid var(--border-light);
+        color: var(--primary-color);
+        /* Use dark border for separator */
+        border-bottom: 2px solid var(--border-dark); 
         padding-bottom: 10px;
         margin-bottom: 20px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, #FFA500 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;        
     }
 
     .question-review-item {
-        background-color: var(--background-white);
+        /* Use the surface color for review items */
+        background-color: var(--surface); 
         border-radius: 8px;
-        box-shadow: var(--shadow-sm);
+        /* Use the small dark shadow */
+        box-shadow: var(--shadow-sm-dark); 
         padding: 20px;
         margin-bottom: 15px;
         border-left: 5px solid;
         transition: box-shadow 0.3s ease;
     }
+    /* Add subtle hover effect */
+    .question-review-item:hover {
+        box-shadow: 0 0 10px rgba(255, 214, 0, 0.1); 
+    }
     
-    .correct-icon { color: var(--success-green); border-left: var(--success-green); }
-    .incorrect-icon { color: var(--error-red); }
+    .correct-answer { border-left-color: var(--success-green); }
+    .incorrect-answer { border-left-color: var(--error-red); }
     .unanswered { border-left-color: var(--warning-orange); }
+    
+    .question-header {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 15px;
+    }
 
-    /* --- Feedback Section (NEW - Card styling adjusted) --- */
+    .answer-detail {
+        padding-top: 15px;
+        /* Use dark border for detail separator */
+        border-top: 1px dashed var(--border-dark); 
+    }
+    .answer-line {
+        display: flex;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+        align-items: center;
+    }
+    .answer-label {
+        font-weight: 600;
+        color: var(--text-secondary);
+        width: 150px; 
+        flex-shrink: 0;
+    }
+    .answer-text {
+        color: var(--text-primary);
+        font-weight: 500;
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .mcq-options-container {
+        margin: 15px 0 20px 0;
+        padding-left: 5px;
+    }
+    .mcq-options-container strong {
+        display: block; 
+        margin-bottom: 5px; 
+        color: var(--text-primary); 
+        font-size: 1rem;
+    }
+    .mcq-options-container ol {
+        padding-left: 20px; 
+        list-style-type: upper-alpha; 
+        margin-top: 0;
+    }
+    .mcq-options-container li {
+        color: var(--text-secondary); 
+        margin-bottom: 5px; 
+        font-weight: 400; 
+        font-size: 0.95rem;
+    }
+    .correct-option {
+        color: var(--success-green); 
+        font-weight: 600;
+    }
+    .user-incorrect-option {
+        color: var(--error-red); 
+        font-weight: 600;
+    }
+
+    /* --- Feedback Section --- */
     .feedback-section {
-        background-color: var(--background-white);
+        /* Use the surface color for feedback card */
+        background-color: var(--surface); 
         border-radius: 12px;
-        box-shadow: var(--shadow-sm);
+        box-shadow: var(--shadow-sm-dark);
         padding: 25px;
         margin-top: 30px; 
         margin-bottom: 30px;
-        border: 1px solid var(--border-light);
+        /* Use the dark border */
+        border: 1px solid var(--border-dark); 
         text-align: center;
     }
     .feedback-title {
         font-size: 1.5rem;
         font-weight: 600;
-        color: var(--text-primary);
+        color: var(--primary-color);
         margin-bottom: 5px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, #FFA500 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
     .feedback-description {
         color: var(--text-secondary);
@@ -162,14 +266,16 @@
     }
     .stars {
         font-size: 2.2rem;
-        color: var(--border-light);
+        /* Use text-muted for unrated stars */
+        color: var(--text-muted); 
         cursor: pointer;
         display: inline-flex;
         gap: 5px;
         user-select: none;
     }
     .stars .rated {
-        color: var(--primary-color);
+        /* Primary color for rated stars */
+        color: var(--primary-color); 
     }
     .rating-text {
         color: var(--text-muted);
@@ -184,14 +290,14 @@
         margin-top: 15px;
     }
     .feedback-actions-row {
-        /* NEW: This is now inside the feedback form/card */
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         align-items: center;
         gap: 10px;
         margin-top: 20px;
-        border-top: 1px dashed var(--border-light);
+        /* Use dark border for action separator */
+        border-top: 1px dashed var(--border-dark); 
         padding-top: 20px;
     }
 
@@ -202,7 +308,8 @@
         gap: 5px;
         text-decoration: none;
         background: none;
-        border: 1px solid var(--info-blue);
+        /* Keep info blue, but use dark theme transparency for hover */
+        border: 1px solid var(--info-blue); 
         color: var(--info-blue);
         padding: 8px 15px;
         border-radius: 8px;
@@ -212,11 +319,12 @@
     }
 
     .action-btn:hover {
-        background-color: var(--info-blue);
-        color: var(--background-white);
+        /* Use info blue on hover, text is primary */
+        background-color: var(--info-blue); 
+        color: var(--background-color); 
+        border-color: var(--info-blue);
     }
     
-    /* Removed .download-form styling as it's now a div in the HTML */
     .download-controls { 
         display: flex; 
         gap: 10px; 
@@ -225,8 +333,9 @@
     .download-select {
         padding: 8px 10px;
         border-radius: 8px;
-        border: 1px solid var(--border-light);
-        background-color: var(--background-light);
+        /* Use dark border and surface for input/select elements */
+        border: 1px solid var(--border-dark); 
+        background-color: var(--secondary-color); /* Slightly darker than surface for contrast */
         color: var(--text-primary);
         font-size: 0.9rem;
     }
@@ -236,12 +345,13 @@
         padding: 12px 25px;
         font-size: 1.1rem;
         border-radius: 8px;
-        background-color: var(--primary-color);
-        color: var(--text-primary);
+        /* Primary button uses primary color for background and secondary color for text */
+        background-color: var(--primary-color); 
+        color: var(--secondary-color); 
         font-weight: 600;
         text-decoration: none;
         display: inline-block;
-        box-shadow: var(--shadow-sm);
+        box-shadow: var(--shadow-sm-dark);
         transition: background-color 0.3s, box-shadow 0.3s;
         display: block; 
         width: fit-content;
@@ -249,8 +359,9 @@
     }
 
     .retake-btn:hover {
-        background-color: var(--primary-dark);
-        box-shadow: var(--shadow-md);
+        /* Primary dark for hover */
+        background-color: var(--primary-dark); 
+        box-shadow: var(--shadow-md-dark);
     }
     
     @media (max-width: 600px) {
@@ -326,7 +437,6 @@
         <h2>Detailed Answer Review</h2>
         
         {% for detail in results.details %}
-            {% with q_index=forloop.counter0 %}
             
             <div class="question-review-item {% if detail.is_correct %}correct-answer{% elif detail.user_answer %}incorrect-answer{% else %}unanswered{% endif %}">
                 
@@ -335,19 +445,43 @@
                     <span class="type-tag">{{ detail.type|upper }}</span>
                 </div>
 
+                {% if detail.type|lower == 'mcq' and detail.options %}
+                    <div class="mcq-options-container">
+                        <strong>Options:</strong>
+                        <ol>
+                        {% for option in detail.options %}
+                            <li>
+                                {% if option|lower == detail.correct_answer|lower %}
+                                    <span class="correct-option">
+                                        <i class="fas fa-check-circle"></i> 
+                                        {{ option }} (Correct)
+                                    </span>
+                                {% elif option|lower == detail.user_answer|lower and not detail.is_correct %}
+                                    <span class="user-incorrect-option">
+                                        <i class="fas fa-times-circle"></i> 
+                                        {{ option }} (Your Choice)
+                                    </span>
+                                {% else %}
+                                    {{ option }}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        </ol>
+                    </div>
+                {% endif %}
                 <div class="answer-detail">
                     <div class="answer-line">
                         <span class="answer-label">Your Answer:</span>
                         <span class="answer-text">
                             {% if detail.user_answer %}
                                 {% if detail.is_correct %}
-                                    <i class="fas fa-check-circle correct-icon"></i>
+                                    <i class="fas fa-check-circle" style="color: var(--success-green);"></i>
                                 {% else %}
-                                    <i class="fas fa-times-circle incorrect-icon"></i>
+                                    <i class="fas fa-times-circle" style="color: var(--error-red);"></i>
                                 {% endif %}
                                 {{ detail.user_answer }}
                             {% else %}
-                                <i class="fas fa-minus-circle incorrect-icon"></i> (Unanswered)
+                                <i class="fas fa-minus-circle" style="color: var(--warning-orange);"></i> (Unanswered)
                             {% endif %}
                         </span>
                     </div>
@@ -368,7 +502,6 @@
                 </div>
             </div>
             
-            {% endwith %}
         {% empty %}
             <p class="text-center text-muted">No questions were found in the quiz session for review.</p>
         {% endfor %}
@@ -401,7 +534,8 @@
                     <i class="fas fa-comment"></i>
                     Give Feedback
                 </a>
-                <button type="button" class="action-btn" onclick="shareApp()">
+                
+                <button type="button" class="action-btn" id="share-button">
                     <i class="fas fa-share-alt"></i>
                     Share
                 </button>
@@ -412,7 +546,7 @@
                         <option value="pdf">PDF</option>
                         <option value="docx">DOCX</option>
                     </select>
-                    <button type="button" class="action-btn" onclick="triggerDownload()">
+                    <button type="button" class="action-btn" id="download-button">
                         <i class="fas fa-download"></i>
                         Download Quiz
                     </button>
@@ -440,7 +574,11 @@
     let currentRating = 0; 
 
 
-    // --- NEW FIX: Download Logic ---
+    // =======================================
+    // CORE FUNCTIONALITY
+    // =======================================
+
+    // --- Download Logic ---
     function triggerDownload() {
         const formatSelect = document.getElementById('download-format-select');
         const format = formatSelect.value;
@@ -451,7 +589,6 @@
         // Create a temporary link element and click it to trigger the download
         const link = document.createElement('a');
         link.href = downloadUrl;
-        // The `download` attribute is optional here but can help ensure the file is saved
         link.download = ''; 
         document.body.appendChild(link);
         link.click();
@@ -460,52 +597,19 @@
         console.log(`Attempting to download quiz in ${format.toUpperCase()} format.`);
     }
 
-
-    // --- Existing Client-side Interactivity (MathJax, Copy) ---
-
+    // --- MathJax Renderer ---
     function renderMathJax() {
         if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
             const reviewContainer = document.querySelector('.review-section');
             if (reviewContainer) {
-                 MathJax.typesetPromise([reviewContainer]).catch(e => console.warn('MathJax typeset error on results page', e));
+                MathJax.typesetPromise([reviewContainer]).catch(e => console.warn('MathJax typeset error on results page', e));
             } else {
-                 MathJax.typesetPromise().catch(e => console.warn('MathJax typeset error on results page', e));
+                MathJax.typesetPromise().catch(e => console.warn('MathJax typeset error on results page', e));
             }
         }
     }
-
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.copy-btn')) {
-            handleCopy(e);
-        }
-    });
-
-    function handleCopy(event) {
-        event.preventDefault();
-        const button = event.target.closest('.action-btn');
-        if (button) {
-            const textToCopy = button.getAttribute('data-text');
-            copyToClipboard(textToCopy);
-
-            // UI feedback
-            const originalText = button.innerHTML;
-            const originalStyle = button.getAttribute('style') || '';
-            button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-            button.style.background = 'var(--success-green)';
-            button.style.color = 'white';
-            button.style.borderColor = 'var(--success-green)';
-            
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                if (originalStyle) {
-                     button.setAttribute('style', originalStyle); 
-                } else {
-                    button.removeAttribute('style');
-                }
-            }, 2000);
-        }
-    }
-
+    
+    // --- Clipboard Functions ---
     function copyToClipboard(text) {
         if (navigator.clipboard) {
             navigator.clipboard.writeText(text).catch(err => {
@@ -532,77 +636,38 @@
         }
         document.body.removeChild(textArea);
     }
-
-
-    // --- NEW FEATURE LOGIC: Star Rating and Submission (AJAX) ---
     
-    function highlightStars(rating) {
-        ratingStars.querySelectorAll('.fas.fa-star').forEach(star => {
-            const starRating = parseInt(star.dataset.rating);
-            if (starRating <= rating) {
-                star.classList.add('rated');
-            } else {
-                star.classList.remove('rated');
-            }
-        });
+    function handleCopy(event) {
+        event.preventDefault();
+        const button = event.target.closest('.action-btn');
+        if (button) {
+            const textToCopy = button.getAttribute('data-text');
+            copyToClipboard(textToCopy);
+
+            // UI feedback
+            const originalText = button.innerHTML;
+            const originalStyle = button.getAttribute('style') || '';
+            button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            button.style.background = 'var(--success-green)';
+            button.style.color = 'white';
+            button.style.borderColor = 'var(--success-green)';
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                if (originalStyle) {
+                    button.setAttribute('style', originalStyle); 
+                } else {
+                    button.removeAttribute('style');
+                }
+            }, 2000);
+        }
     }
 
-    ratingStars.addEventListener('mouseover', function(e) {
-        const star = e.target.closest('.fas.fa-star');
-        if (!star || currentRating > 0) return;
 
-        const rating = parseInt(star.dataset.rating);
-        highlightStars(rating);
-    });
+    // --- Share App Logic ---
+    function shareApp(event) {
+        const shareBtn = event.currentTarget; 
 
-    ratingStars.addEventListener('mouseleave', function() {
-        if (currentRating === 0) {
-            highlightStars(0);
-        } else {
-            highlightStars(currentRating);
-        }
-    });
-
-    ratingStars.addEventListener('click', async function(e) {
-        const star = e.target.closest('.fas.fa-star');
-        if (!star || currentRating > 0) return;
-
-        const rating = parseInt(star.dataset.rating);
-        currentRating = rating; 
-        highlightStars(rating);
-        ratingInput.value = rating;
-        ratingStatus.textContent = `Rating: ${rating} out of 5!`;
-
-        const formData = new FormData(feedbackForm);
-        const url = window.location.href; 
-
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest' 
-                }
-            });
-
-            if (response.ok) {
-                ratingStars.style.pointerEvents = 'none'; 
-                ratingStatus.style.display = 'none';
-                submittedMessage.style.display = 'block';
-            } else {
-                console.error("Feedback submission failed with status:", response.status);
-                ratingStatus.textContent = `Rated ${rating}/5. Submission failed. Please try again.`;
-                submittedMessage.style.display = 'none';
-            }
-        } catch (error) {
-            console.error("Feedback submission error:", error);
-            ratingStatus.textContent = `Rated ${rating}/5. Network error. Please try again.`;
-            submittedMessage.style.display = 'none';
-        }
-    });
-    
-    // --- NEW FEATURE LOGIC: Share App ---
-    function shareApp() {
         // Get the base URL (e.g., "https://yourdomain.com")
         const appUrl = window.location.origin; 
         const text = `I use Lamla AI to prepare for exams! It generates quizzes from any text or file. Check it out here: ${appUrl}`;
@@ -616,7 +681,6 @@
         } else {
             // Fallback: copy to clipboard
             copyToClipboard(text);
-            const shareBtn = event.target.closest('button');
             const originalText = shareBtn.innerHTML;
             shareBtn.innerHTML = '<i class="fas fa-check"></i> Link Copied!';
             
@@ -627,9 +691,94 @@
     }
 
 
-    // --- Animate progress bar on load (EXISTING) ---
+    // =======================================
+    // FEEDBACK RATING LOGIC
+    // =======================================
+    
+    function highlightStars(rating) {
+        ratingStars.querySelectorAll('.fas.fa-star').forEach(star => {
+            const starRating = parseInt(star.dataset.rating);
+            if (starRating <= rating) {
+                star.classList.add('rated');
+            } else {
+                star.classList.remove('rated');
+            }
+        });
+    }
+
+    if (ratingStars) {
+        ratingStars.addEventListener('mouseover', function(e) {
+            const star = e.target.closest('.fas.fa-star');
+            if (!star || currentRating > 0) return;
+
+            const rating = parseInt(star.dataset.rating);
+            highlightStars(rating);
+        });
+
+        ratingStars.addEventListener('mouseleave', function() {
+            if (currentRating === 0) {
+                highlightStars(0);
+            } else {
+                highlightStars(currentRating);
+            }
+        });
+
+        ratingStars.addEventListener('click', async function(e) {
+            const star = e.target.closest('.fas.fa-star');
+            if (!star || currentRating > 0) return;
+
+            const rating = parseInt(star.dataset.rating);
+            currentRating = rating; 
+            highlightStars(rating);
+            ratingInput.value = rating;
+            ratingStatus.textContent = `Rating: ${rating} out of 5!`;
+
+            const formData = new FormData(feedbackForm);
+            const url = window.location.href; 
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest' 
+                    }
+                });
+
+                if (response.ok) {
+                    ratingStars.style.pointerEvents = 'none'; 
+                    ratingStatus.style.display = 'none';
+                    submittedMessage.style.display = 'block';
+                } else {
+                    console.error("Feedback submission failed with status:", response.status);
+                    ratingStatus.textContent = `Rated ${rating}/5. Submission failed. Please try again.`;
+                    submittedMessage.style.display = 'none';
+                }
+            } catch (error) {
+                console.error("Feedback submission error:", error);
+                ratingStatus.textContent = `Rated ${rating}/5. Network error. Please try again.`;
+                submittedMessage.style.display = 'none';
+            }
+        });
+    }
+
+    // =======================================
+    // INITIALIZATION / EVENT LISTENERS
+    // =======================================
+    
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.copy-btn')) {
+            handleCopy(e);
+        }
+    });
+
+    // --- Animate progress bar and attach listeners on load ---
     document.addEventListener('DOMContentLoaded', function() {
         const progressBar = document.querySelector('.progress-bar');
+        const downloadButton = document.getElementById('download-button');
+        const shareButton = document.getElementById('share-button');
+
+        // 1. Progress Bar Animation
         if (progressBar) {
             const width = progressBar.style.width;
             progressBar.style.width = '0%';
@@ -640,7 +789,15 @@
             });
         }
         
-        // Call the MathJax renderer after DOM is loaded
+        // 2. Attach Listeners for Download and Share
+        if (downloadButton) {
+            downloadButton.addEventListener('click', triggerDownload);
+        }
+        if (shareButton) {
+            shareButton.addEventListener('click', shareApp);
+        }
+
+        // 3. Call MathJax renderer
         renderMathJax();
     });
 </script>

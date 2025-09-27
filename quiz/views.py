@@ -405,15 +405,21 @@ def quiz_results(request):
             # Grade MCQ questions
             for idx, q in enumerate(mcq_questions):
                 user_ans = user_answers.get(str(idx), '').strip().upper()
-                correct_ans = q.get('answer', '').strip().upper()
+                correct_ans = q.get('answer', '').strip()
+                
+                 # We compare the user's selected letter/value (user_ans) to the correct one (correct_ans.upper())
                 is_correct = user_ans == correct_ans
+                
+                # Get the list of options
+                question_options = q.get('options', [])
                 
                 results['details'].append({
                     'question': q.get('question', ''),
                     'user_answer': user_ans,
                     'correct_answer': correct_ans,
                     'is_correct': is_correct,
-                    'type': 'mcq'
+                    'type': 'mcq',
+                    'options': question_options,
                 })
                 if is_correct:
                     results['correct'] += 1
@@ -441,7 +447,8 @@ def quiz_results(request):
                     'user_answer': user_ans,
                     'correct_answer': expected_ans,
                     'is_correct': is_correct,
-                    'type': 'short'
+                    'type': 'short',
+                    'options': []
                 })
                 if is_correct:
                     results['correct'] += 1
