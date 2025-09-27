@@ -20,7 +20,7 @@
 .home-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 12px;
 }
 
 /* Hero Section */
@@ -30,7 +30,7 @@
     align-items: center;
     justify-content: center;
     min-height: 90vh;
-    padding: 100px 0;
+    padding: 40px 16px;
     background-image: url('../img/student_desk.webp');
     background-size: cover;
     background-position: center;
@@ -300,15 +300,19 @@
 }
 
 .features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 32px;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 24px;
+    justify-content: center;
 }
 
 .feature-card {
+    flex-basis: calc(50% - 22px);
+    flex-grow: 0;
+    flex-shrink: 0;
     position: relative;
     background: var(--surface);
     border-radius: var(--radius-lg);
@@ -734,28 +738,44 @@
         font-size: 1rem;
     }
     .hero-btn {
-        max-width: 280px;
+        width: 100%;
+        max-width: none;
         padding: 12px 20px;
         font-size: 0.95rem;
     }
+    .testimonials-grid {
+        grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    }
+    .hero-btns, .hero-btn {
+        width: 100%;
+        max-width: none;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
     .features-section,
     .newsletter-section,
     .testimonials-section {
-        padding: 40px 16px;
-        margin-bottom: 40px;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        margin-bottom: 30px;
     }
     .feature-card {
+        flex-basis: calc(100% - 16px);
         padding: 24px 20px;
+        min-height: auto;
     }
     .feature-icon {
         width: 60px;
         height: 60px;
+        margin: 0 auto 16px;
     }
     .icon-emoji {
         font-size: 2rem;
     }
     .feature-title {
         font-size: 1.2rem;
+        margin-bottom: 12px;
     }
     .testimonial-quote {
         font-size: 1.1rem;
