@@ -1,0 +1,647 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+    <title>Quiz Results</title>
+{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+    :root {
+        --primary-color: #FFD600;
+        --primary-dark: #E6C200;
+        --secondary-color: #222;
+        --background-white: #fff;
+        --background-light: #f8fafc;
+        --text-primary: #1a1a1a;
+        --text-secondary: #4a5568;
+        --text-muted: #718096;
+        --border-light: #e2e8f0;
+        --success-green: #10b981;
+        --error-red: #ef4444;
+        --warning-orange: #f59e0b;
+        --info-blue: #3b82f6;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--background-light);
+    }
+    
+    .results-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    /* --- Summary Card (Main Score) --- */
+    .summary-card {
+        background-color: var(--background-white);
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        padding: 30px;
+        margin-bottom: 30px;
+        border-top: 5px solid var(--primary-color);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .summary-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .summary-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 5px;
+    }
+
+    .summary-header p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+    }
+
+    .score-metrics {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .metric {
+        text-align: center;
+        min-width: 120px;
+    }
+
+    .metric h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--success-green);
+        line-height: 1;
+    }
+
+    .metric p {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-top: 5px;
+    }
+
+    .progress-bar-container {
+        background-color: var(--border-light);
+        border-radius: 8px;
+        height: 12px;
+        margin-top: 10px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background-color: var(--primary-color);
+        width: 0%; 
+        transition: width 1s ease-out;
+        border-radius: 8px;
+    }
+
+    /* --- Review Section --- */
+    .review-section h2 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        border-bottom: 2px solid var(--border-light);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    .question-review-item {
+        background-color: var(--background-white);
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
+        padding: 20px;
+        margin-bottom: 15px;
+        border-left: 5px solid;
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .correct-icon { color: var(--success-green); border-left: var(--success-green); }
+    .incorrect-icon { color: var(--error-red); }
+    .unanswered { border-left-color: var(--warning-orange); }
+
+    /* --- Feedback Section (NEW - Card styling adjusted) --- */
+    .feedback-section {
+        background-color: var(--background-white);
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        padding: 25px;
+        margin-top: 30px; 
+        margin-bottom: 30px;
+        border: 1px solid var(--border-light);
+        text-align: center;
+    }
+    .feedback-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 5px;
+    }
+    .feedback-description {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        margin-bottom: 15px;
+    }
+    .rating-container {
+        margin-bottom: 15px;
+    }
+    .stars {
+        font-size: 2.2rem;
+        color: var(--border-light);
+        cursor: pointer;
+        display: inline-flex;
+        gap: 5px;
+        user-select: none;
+    }
+    .stars .rated {
+        color: var(--primary-color);
+    }
+    .rating-text {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-top: 10px;
+        font-weight: 500;
+    }
+    #feedback-submitted-message {
+        display: none;
+        color: var(--success-green);
+        font-weight: 600;
+        margin-top: 15px;
+    }
+    .feedback-actions-row {
+        /* NEW: This is now inside the feedback form/card */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+        border-top: 1px dashed var(--border-light);
+        padding-top: 20px;
+    }
+
+    /* --- Action/Download Buttons --- */
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        background: none;
+        border: 1px solid var(--info-blue);
+        color: var(--info-blue);
+        padding: 8px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s, color 0.3s, border-color 0.3s;
+        font-size: 0.9rem;
+    }
+
+    .action-btn:hover {
+        background-color: var(--info-blue);
+        color: var(--background-white);
+    }
+    
+    /* Removed .download-form styling as it's now a div in the HTML */
+    .download-controls { 
+        display: flex; 
+        gap: 10px; 
+        align-items: center; 
+    }
+    .download-select {
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid var(--border-light);
+        background-color: var(--background-light);
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+
+    /* --- Retake Button (Last Element - standalone) --- */
+    .retake-btn {
+        padding: 12px 25px;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        background-color: var(--primary-color);
+        color: var(--text-primary);
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        box-shadow: var(--shadow-sm);
+        transition: background-color 0.3s, box-shadow 0.3s;
+        display: block; 
+        width: fit-content;
+        margin: 30px auto 0 auto; 
+    }
+
+    .retake-btn:hover {
+        background-color: var(--primary-dark);
+        box-shadow: var(--shadow-md);
+    }
+    
+    @media (max-width: 600px) {
+        .results-container {
+            margin: 20px 10px;
+            padding: 10px;
+        }
+        .summary-card {
+            padding: 20px;
+        }
+        .score-metrics {
+            flex-direction: column;
+        }
+        .metric h2 {
+            font-size: 2rem;
+        }
+        .feedback-actions-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .feedback-actions-row .action-btn,
+        .download-controls,
+        .download-select {
+            width: 100%;
+        }
+        .retake-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="results-container">
+    
+    <div class="summary-card">
+        <div class="summary-header">
+            <h1 id="score-message">
+                {% if score_percent >= 80 %}
+                    Excellent Work!
+                {% elif score_percent >= 50 %}
+                    Good Effort!
+                {% else %}
+                    Time to Review!
+                {% endif %}
+            </h1>
+            <p>
+                You completed the <strong>{{ subject }} Quiz</strong> <br>
+                Source File: <strong>{{ uploaded_file_name|default:"Custom Text" }}</strong>
+            </p>
+        </div>
+
+        <div class="score-metrics">
+            <div class="metric">
+                <h2 id="final-score" style="color: {% if score_percent >= 70 %}var(--success-green){% elif score_percent >= 50 %}var(--warning-orange){% else %}var(--error-red){% endif %};">
+                    {{ score }}/{{ total }}
+                </h2>
+                <p>Correct Answers</p>
+            </div>
+            
+            <div class="metric">
+                <h2 id="percentage-score" style="color: {% if score_percent >= 70 %}var(--success-green){% elif score_percent >= 50 %}var(--warning-orange){% else %}var(--error-red){% endif %};">
+                    {{ score_percent|floatformat:1 }}%
+                </h2>
+                <p>Overall Score</p>
+            </div>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" style="width: {{ score_percent }}%;"></div>
+        </div>
+    </div>
+    
+    <div class="review-section">
+        <h2>Detailed Answer Review</h2>
+        
+        {% for detail in results.details %}
+            {% with q_index=forloop.counter0 %}
+            
+            <div class="question-review-item {% if detail.is_correct %}correct-answer{% elif detail.user_answer %}incorrect-answer{% else %}unanswered{% endif %}">
+                
+                <div class="question-header">
+                    Q{{ forloop.counter }}. {{ detail.question }}
+                    <span class="type-tag">{{ detail.type|upper }}</span>
+                </div>
+
+                <div class="answer-detail">
+                    <div class="answer-line">
+                        <span class="answer-label">Your Answer:</span>
+                        <span class="answer-text">
+                            {% if detail.user_answer %}
+                                {% if detail.is_correct %}
+                                    <i class="fas fa-check-circle correct-icon"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle incorrect-icon"></i>
+                                {% endif %}
+                                {{ detail.user_answer }}
+                            {% else %}
+                                <i class="fas fa-minus-circle incorrect-icon"></i> (Unanswered)
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="answer-line">
+                        <span class="answer-label">Correct Answer:</span>
+                        <span class="answer-text">
+                            {{ detail.correct_answer }}
+                            <button 
+                                class="action-btn copy-btn" 
+                                data-text="{{ detail.correct_answer }}"
+                                title="Copy Correct Answer"
+                            >
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            {% endwith %}
+        {% empty %}
+            <p class="text-center text-muted">No questions were found in the quiz session for review.</p>
+        {% endfor %}
+    </div>
+
+    <form id="feedback-form" method="POST" class="feedback-section">
+        {% csrf_token %}
+        <input type="hidden" name="quiz_id" value="{{ results.quiz_id }}"> 
+        <input type="hidden" name="rating" id="feedback-rating-input" value="0"> 
+
+        <h3 class="feedback-title">How was your experience?</h3>
+        <p class="feedback-description">Your feedback helps us improve Lamla AI for everyone!</p>
+        
+        <div class="rating-container">
+            <div class="stars" id="rating-stars">
+                <i class="fas fa-star" data-rating="1"></i>
+                <i class="fas fa-star" data-rating="2"></i>
+                <i class="fas fa-star" data-rating="3"></i>
+                <i class="fas fa-star" data-rating="4"></i>
+                <i class="fas fa-star" data-rating="5"></i>
+            </div>
+            <p class="rating-text" id="rating-status">Click to rate your experience</p>
+        </div>
+        
+        <p id="feedback-submitted-message">Thank you! Your rating has been recorded. 🎉</p>
+
+        <div class="feedback-actions-row">
+            {% if not no_quiz_message %}
+                <a class="action-btn" href="/about/?subject=Quiz%20Feedback#get-in-touch" title="Send detailed feedback">
+                    <i class="fas fa-comment"></i>
+                    Give Feedback
+                </a>
+                <button type="button" class="action-btn" onclick="shareApp()">
+                    <i class="fas fa-share-alt"></i>
+                    Share
+                </button>
+                
+                <div class="download-controls">
+                    <select id="download-format-select" class="download-select">
+                        <option value="txt">TXT</option>
+                        <option value="pdf">PDF</option>
+                        <option value="docx">DOCX</option>
+                    </select>
+                    <button type="button" class="action-btn" onclick="triggerDownload()">
+                        <i class="fas fa-download"></i>
+                        Download Quiz
+                    </button>
+                </div>
+                {% endif %}
+        </div>
+    </form>
+    
+    <a href="{% url 'custom_quiz' %}" class="retake-btn">
+        Generate a New Quiz
+    </a>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // --- Feedback Elements ---
+    const ratingStars = document.getElementById('rating-stars');
+    const ratingInput = document.getElementById('feedback-rating-input');
+    const ratingStatus = document.getElementById('rating-status');
+    const feedbackForm = document.getElementById('feedback-form');
+    const submittedMessage = document.getElementById('feedback-submitted-message');
+
+    let currentRating = 0; 
+
+
+    // --- NEW FIX: Download Logic ---
+    function triggerDownload() {
+        const formatSelect = document.getElementById('download-format-select');
+        const format = formatSelect.value;
+        
+        // Construct the URL using the format parameter and the Django URL tag
+        const downloadUrl = "{% url 'download_quiz_text' %}?format=" + format;
+        
+        // Create a temporary link element and click it to trigger the download
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        // The `download` attribute is optional here but can help ensure the file is saved
+        link.download = ''; 
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        console.log(`Attempting to download quiz in ${format.toUpperCase()} format.`);
+    }
+
+
+    // --- Existing Client-side Interactivity (MathJax, Copy) ---
+
+    function renderMathJax() {
+        if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
+            const reviewContainer = document.querySelector('.review-section');
+            if (reviewContainer) {
+                 MathJax.typesetPromise([reviewContainer]).catch(e => console.warn('MathJax typeset error on results page', e));
+            } else {
+                 MathJax.typesetPromise().catch(e => console.warn('MathJax typeset error on results page', e));
+            }
+        }
+    }
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.copy-btn')) {
+            handleCopy(e);
+        }
+    });
+
+    function handleCopy(event) {
+        event.preventDefault();
+        const button = event.target.closest('.action-btn');
+        if (button) {
+            const textToCopy = button.getAttribute('data-text');
+            copyToClipboard(textToCopy);
+
+            // UI feedback
+            const originalText = button.innerHTML;
+            const originalStyle = button.getAttribute('style') || '';
+            button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            button.style.background = 'var(--success-green)';
+            button.style.color = 'white';
+            button.style.borderColor = 'var(--success-green)';
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                if (originalStyle) {
+                     button.setAttribute('style', originalStyle); 
+                } else {
+                    button.removeAttribute('style');
+                }
+            }, 2000);
+        }
+    }
+
+    function copyToClipboard(text) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).catch(err => {
+                console.error('Failed to copy text: ', err);
+                fallbackCopy(text);
+            });
+        } else {
+            fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+        } catch (err) {
+            console.error('Fallback: Oops, unable to copy', err);
+        }
+        document.body.removeChild(textArea);
+    }
+
+
+    // --- NEW FEATURE LOGIC: Star Rating and Submission (AJAX) ---
+    
+    function highlightStars(rating) {
+        ratingStars.querySelectorAll('.fas.fa-star').forEach(star => {
+            const starRating = parseInt(star.dataset.rating);
+            if (starRating <= rating) {
+                star.classList.add('rated');
+            } else {
+                star.classList.remove('rated');
+            }
+        });
+    }
+
+    ratingStars.addEventListener('mouseover', function(e) {
+        const star = e.target.closest('.fas.fa-star');
+        if (!star || currentRating > 0) return;
+
+        const rating = parseInt(star.dataset.rating);
+        highlightStars(rating);
+    });
+
+    ratingStars.addEventListener('mouseleave', function() {
+        if (currentRating === 0) {
+            highlightStars(0);
+        } else {
+            highlightStars(currentRating);
+        }
+    });
+
+    ratingStars.addEventListener('click', async function(e) {
+        const star = e.target.closest('.fas.fa-star');
+        if (!star || currentRating > 0) return;
+
+        const rating = parseInt(star.dataset.rating);
+        currentRating = rating; 
+        highlightStars(rating);
+        ratingInput.value = rating;
+        ratingStatus.textContent = `Rating: ${rating} out of 5!`;
+
+        const formData = new FormData(feedbackForm);
+        const url = window.location.href; 
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest' 
+                }
+            });
+
+            if (response.ok) {
+                ratingStars.style.pointerEvents = 'none'; 
+                ratingStatus.style.display = 'none';
+                submittedMessage.style.display = 'block';
+            } else {
+                console.error("Feedback submission failed with status:", response.status);
+                ratingStatus.textContent = `Rated ${rating}/5. Submission failed. Please try again.`;
+                submittedMessage.style.display = 'none';
+            }
+        } catch (error) {
+            console.error("Feedback submission error:", error);
+            ratingStatus.textContent = `Rated ${rating}/5. Network error. Please try again.`;
+            submittedMessage.style.display = 'none';
+        }
+    });
+    
+    // --- NEW FEATURE LOGIC: Share App ---
+    function shareApp() {
+        // Get the base URL (e.g., "https://yourdomain.com")
+        const appUrl = window.location.origin; 
+        const text = `I use Lamla AI to prepare for exams! It generates quizzes from any text or file. Check it out here: ${appUrl}`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: 'Lamla AI',
+                text: text,
+                url: appUrl,
+            }).catch(error => console.error('Error sharing', error));
+        } else {
+            // Fallback: copy to clipboard
+            copyToClipboard(text);
+            const shareBtn = event.target.closest('button');
+            const originalText = shareBtn.innerHTML;
+            shareBtn.innerHTML = '<i class="fas fa-check"></i> Link Copied!';
+            
+            setTimeout(() => {
+                shareBtn.innerHTML = originalText;
+            }, 2000);
+        }
+    }
+
+
+    // --- Animate progress bar on load (EXISTING) ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const progressBar = document.querySelector('.progress-bar');
+        if (progressBar) {
+            const width = progressBar.style.width;
+            progressBar.style.width = '0%';
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    progressBar.style.width = width;
+                }, 500);
+            });
+        }
+        
+        // Call the MathJax renderer after DOM is loaded
+        renderMathJax();
+    });
+</script>
+{% endblock %}

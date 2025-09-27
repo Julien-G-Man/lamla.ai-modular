@@ -1,39 +1,35 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, FileResponse 
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
 from allauth.account.views import LoginView as AllauthLoginView
 from allauth.account.adapter import DefaultAccountAdapter
-import json
-import logging
-import os
+import PyPDF2
+import docx
+from urllib.parse import quote
+from django.utils import timezone
+import base64, pytesseract
 from .models import (
     Question, QuestionCache, QuizSession
 )
-from analytics.models import ExamDocument, ExamAnalysis
-from .question_generator import generate_questions_from_text
-from .flashcard_generator import generate_flashcards_from_text
-from .services import QuizService
-
-import PyPDF2
-import docx
-import io
-from io import BytesIO
-from zoneinfo import ZoneInfo
-from datetime import datetime
-import re
-import textwrap
-import unicodedata
-from urllib.parse import quote
-from django.http import HttpResponse, FileResponse 
-from django.utils import timezone
-import base64
-import pytesseract
+import json
+import logging
+import os
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.template.loader import render_to_string
+import uuid
+from django.urls import reverse
+import uuid
+
+from analytics.models import ExamDocument, ExamAnalysis
+from .services import QuizService
+from .question_generator import generate_questions_from_text
+from .flashcard_generator import generate_flashcards_from_text
+from .quiz_download_utils import handle_quiz_download
+
 
 logger = logging.getLogger(__name__)
 
@@ -144,7 +140,7 @@ def generate_questions(request):
         # Determine the actual subject to use
         if subject_select == 'Other' and custom_subject:
             subject = custom_subject
-        elif subject_select in STANDARD_SUBJECTS:
+        elif subject_select in STANDARD_SUBJECTS: # Assumes STANDARD_SUBJECTS is defined
             subject = subject_select
         else:
             subject = 'General'  # Default subject
@@ -191,6 +187,7 @@ def generate_questions(request):
         quiz_results = None
         try:
             logger.info("Calling generate_questions_from_text...")
+            # Assumes QuizService.generate_quiz is a synchronous blocking call
             quiz_results = QuizService.generate_quiz(
                 study_text, 
                 num_mcq, 
@@ -224,14 +221,18 @@ def generate_questions(request):
                         q['question'] = q.get('question', '')
                         q['answer'] = q.get('answer', '')
                 
-                # Limit to requested counts
-                quiz_results['mcq_questions'] = mcq_questions[:num_mcq]
-                quiz_results['short_questions'] = short_questions[:num_short]
+                # 1. Strictly limit the lists to the requested counts.
+                mcq_questions = mcq_questions[:num_mcq]
+                short_questions = short_questions[:num_short]
+                
+                # 2. Update the quiz_results dictionary with the now-truncated lists.
+                quiz_results['mcq_questions'] = mcq_questions
+                quiz_results['short_questions'] = short_questions
                 quiz_results['subject'] = subject
                 
-                # Log actual counts
-                actual_mcq = len(quiz_results['mcq_questions'])
-                actual_short = len(quiz_results['short_questions'])
+                # Log actual counts (now using the final, strictly sliced lists)
+                actual_mcq = len(mcq_questions)
+                actual_short = len(short_questions)
                 logger.info(f"Generated: {actual_mcq} MCQ, {actual_short} Short Answer questions")
                 
                 if actual_mcq == 0 and actual_short == 0:
@@ -255,7 +256,7 @@ def generate_questions(request):
                 'quiz_time': quiz_time,
             })
         
-        # Store questions in session
+        # Store questions in session (now using the strictly sliced local variables)
         request.session['quiz_questions'] = {
             'mcq_questions': mcq_questions,
             'short_questions': short_questions,
@@ -263,6 +264,11 @@ def generate_questions(request):
         request.session['quiz_time'] = quiz_time
         request.session['uploaded_file_name'] = uploaded_file_name
         request.session['quiz_subject'] = subject
+        request.session.modified = True
+        
+        # Generate a unique quiz ID and store in session
+        request.session['quiz_id'] = str(uuid.uuid4())
+        
         request.session.modified = True
         
         # Clear previous results
@@ -284,13 +290,19 @@ def generate_questions(request):
             'difficulty': request.POST.get('difficulty', 'any'),
         })
 
-
 def quiz(request):
     """
     Renders the quiz page with questions from the session.
     """
     quiz_questions = request.session.get('quiz_questions', {})
     print("SESSION QUESTIONS:", quiz_questions)
+    
+    # Check if results already exist in the session (meaning the quiz was submitted)
+    if 'quiz_results' in request.session and request.session.get('quiz_results'):
+         # If results are found, immediately redirect to the results page to show them.
+        messages.info(request, "You were redirected to your saved results!")
+        return redirect('quiz_results')
+    
     quiz_time = request.session.get('quiz_time', 10)
     
     if not quiz_questions:
@@ -322,13 +334,17 @@ def quiz(request):
             q.setdefault('question', f'Short Answer Question {i+1}')
             q.setdefault('answer', 'Sample answer')
     
+    # Retrieve the unique qiuz id
+    quiz_id = request.session.get('quiz_id')
+    
     context = {
         'questions': {
             'mcq_questions': mcq_questions,
             'short_questions': short_questions,
-            'subject': quiz_questions.get('subject', 'General')
+            'subject': request.session.get('quiz_subject', 'General')
         },
         'quiz_time': quiz_time,
+        'quiz_id': quiz_id,
         'total_questions': len(mcq_questions) + len(short_questions),
         'mcq_count': len(mcq_questions),
         'short_count': len(short_questions),
@@ -339,11 +355,36 @@ def quiz(request):
 
 def quiz_results(request):
     """
-    Handles quiz submission, grading, and displays results.
+    Handles quiz submission, feedback submission, and displays results.
     """
     if request.method == 'POST':
+        # --- 1. Handle Feedback Submission (Form data via AJAX) ---
+        # This checks for the AJAX POST triggered by the star rating system.
+        # It relies on the form data being accessible via request.POST
+        if 'rating' in request.POST and 'quiz_id' in request.POST:
+            try:
+                rating = request.POST.get('rating')
+                quiz_id = request.POST.get('quiz_id')
+                
+                # --- TO DO: Save Feedback to Database ---
+                # Example:
+                # if request.user.is_authenticated:
+                #     QuizFeedback.objects.create(
+                #         user=request.user, 
+                #         quiz_session_id=quiz_id, 
+                #         rating=int(rating)
+                #     )
+                
+                logger.info(f"Feedback received: Quiz ID {quiz_id}, Rating {rating}")
+                return JsonResponse({'status': 'success', 'message': 'Feedback received.'}, status=200)
+
+            except Exception as e:
+                logger.error(f"Failed to process feedback: {str(e)}")
+                return JsonResponse({'status': 'error', 'message': 'Failed to process feedback.'}, status=500)
+
+        # --- 2. Handle Main Quiz Submission (Raw JSON via AJAX) ---
         try:
-            # Parse request data
+            # This is the expected place for the main quiz submission payload
             data = json.loads(request.body.decode('utf-8'))
             user_answers = data.get('user_answers', {})
             quiz_questions = request.session.get('quiz_questions', {})
@@ -357,7 +398,8 @@ def quiz_results(request):
             results = {
                 'total': len(mcq_questions) + len(short_questions),
                 'correct': 0,
-                'details': []
+                'details': [],
+                'quiz_id': request.session.get('current_quiz_id') # Ensure you have a quiz_id in session
             }
 
             # Grade MCQ questions
@@ -378,14 +420,20 @@ def quiz_results(request):
 
             # Grade short answer questions
             for idx, q in enumerate(short_questions):
-                user_ans = user_answers.get(str(len(mcq_questions) + idx), '').strip()
+                # The index for short answers continues after MCQ indices
+                short_idx = len(mcq_questions) + idx
+                user_ans = user_answers.get(str(short_idx), '').strip()
                 expected_ans = q.get('answer', '').strip()
                 
                 # Use QuizService for grading if available, otherwise simple comparison
                 try:
+                    # Assuming QuizService is available and correctly imported
                     is_correct = QuizService.grade_short_answer(q.get('question', ''), expected_ans, user_ans)
-                except:
-                    # Fallback to simple comparison
+                except NameError:
+                    # Fallback if QuizService is not imported or available
+                    is_correct = user_ans.lower() == expected_ans.lower()
+                except Exception:
+                    # Fallback to simple comparison for any other grading error
                     is_correct = user_ans.lower() == expected_ans.lower()
                 
                 results['details'].append({
@@ -408,9 +456,10 @@ def quiz_results(request):
             # Save to database if user is authenticated
             if request.user.is_authenticated:
                 try:
+                    quiz_subject = request.session.get('quiz_subject', '')
                     QuizSession.objects.create(
                         user=request.user,
-                        subject=quiz_questions.get('subject', ''),
+                        subject=quiz_subject,
                         total_questions=results['total'],
                         correct_answers=results['correct'],
                         score_percentage=results['percentage'],
@@ -421,36 +470,53 @@ def quiz_results(request):
                 except Exception as e:
                     logger.error(f"Failed to save quiz session: {str(e)}")
             
-            return JsonResponse({'status': 'ok'})
+            # Return JSON response with the redirect url
+            return JsonResponse({
+                'status': 'ok',
+                'redirect_url': reverse('quiz_results')
+            })
             
+        except json.JSONDecodeError:
+            # This handles the case where the POST is neither feedback nor valid JSON, 
+            # which likely shouldn't happen unless the client side is broken, but it catches the original error.
+            logger.error(f"Quiz results error: JSON decode failed. Request body: {request.body.decode('utf-8')}", exc_info=True)
+            return JsonResponse({'status': 'error', 'message': 'Invalid data format submitted.'}, status=400)
+        
         except Exception as e:
             logger.error(f"Quiz results error: {str(e)}", exc_info=True)
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     
-    else:  # GET request - display results
+    # --- 3. Handle GET request - display results ---
+    else:
         results = request.session.get('quiz_results')
         quiz_questions = request.session.get('quiz_questions', {})
         user_answers = request.session.get('quiz_user_answers', {})
         uploaded_file_name = request.session.get('uploaded_file_name', '')
         
         if not results:
+            # If no results in session, redirect to quiz generation page
+            # Note: Using messages.error requires the messages middleware to be active
             messages.error(request, 'No quiz results found. Please complete a quiz first.')
             return redirect('custom_quiz')
         
         # Prepare context for results page
         context = {
+            # Use 'score' and 'total' from the results dict for presentation
             'score': results.get('correct', 0),
             'total': results.get('total', 0),
             'score_percent': results.get('percentage', 0),
-            'mcq_questions': quiz_questions.get('mcq_questions', []),
-            'short_questions': quiz_questions.get('short_questions', []),
-            'user_answers': user_answers,
-            'results': results,
+            # Use the full quiz_questions for the detailed review loop
+            'results': results, # The results dict contains 'details' which is used in the template
             'uploaded_file_name': uploaded_file_name,
-            'subject': quiz_questions.get('subject', 'General'),
+            'subject': request.session.get('quiz_subject', 'General'),
         }
         return render(request, 'quiz/quiz_results.html', context)
 
+def download_quiz_text(request):
+    """
+    Thin wrapper view that delegates all the heavy lifting to the utility file.
+    """
+    return handle_quiz_download(request)
 
 def flashcards(request):
     """Renders the flashcards page."""

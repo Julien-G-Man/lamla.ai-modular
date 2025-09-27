@@ -1,3 +1,4 @@
+<!-- quiz.html-->
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -277,7 +278,10 @@
           <div class="nav" style="margin-top:16px;">
             <button class="btn" id="quiz-prev" aria-label="Previous question" disabled>◀ Previous</button>
 
-            <div style="display:flex; gap:8px;">
+            <div style="dispay:flex; gap:8px;">
+              <button class="btn primary" id="submit-btn" style="display: none;" aria-label="Submit Quiz">
+                Submit Quiz
+              </button>
               <button class="btn primary" id="quiz-next" aria-label="Next question">Next ▶</button>
             </div>
           </div>
@@ -287,10 +291,21 @@
           <div class="question-body">No questions available. Please generate a quiz first.</div>
         </div>
 
+        <div id="quiz-completion-screen" style="display: none; text-align: center; padding: 50px;">
+            <h2>Quiz Completed! 🎉</h2>
+            <p>You have reached the end of the quiz.</p>
+            <p>Click the button below to submit your answers and view your detailed results.</p>
+    
+            <button type="button" class="btn btn-primary btn-lg mt-4" id="submit-quiz-button">
+                Submit and View Results
+            </button>
+        </div>
+
         <!-- hidden values for JS -->
         <input type="hidden" name="csrfmiddlewaretoken" id="csrf-token" value="{{ csrf_token }}">
         <input type="hidden" id="quiz_time" value="{{ quiz_time }}">
         <input type="hidden" id="quiz-results-url" value="{% url 'quiz_results' %}">
+        <input type="hidden" id="quiz-id-val" value="{{ quiz_id }}">
 
         <!-- JSON question payloads inserted by server -->
         {{ questions.mcq_questions|default:"[]"|json_script:"mcq-questions-json" }}

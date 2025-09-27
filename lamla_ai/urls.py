@@ -29,7 +29,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('', include('materials.urls')),
     path('practice/', include('quiz.urls')),
-    path('', include('chatbot.urls')),
+    path('ai/', include('chatbot.urls')),
     path('analytics/', include('analytics.urls')),
     path('', include('feedback.urls')),
     path('accounts/', include('allauth.urls')),
