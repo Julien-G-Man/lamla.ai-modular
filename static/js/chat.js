@@ -1,180 +1,106 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+// static/js/chat.js
 
-// Global variables for Firebase services
-let app;
-let db;
-let auth;
-let userId;
-let appId;
-let isAuthReady = false;
+const chatMessages = document.getElementById("chat-messages");
+const messageInput = document.getElementById("message-input");
+const sendBtn = document.getElementById("send-btn");
+const typingIndicator = document.getElementById("typing-indicator");
 
-// Set Firebase debug logs
-setLogLevel('debug');
-
-const messageInput = document.getElementById('message-input');
-const sendBtn = document.getElementById('send-btn');
-const chatMessages = document.getElementById('chat-messages');
-const typingIndicator = document.getElementById('typing-indicator');
-const userIdDisplay = document.getElementById('user-id-display');
-
-// Initialize Firebase and Auth
-async function initFirebase() {
-    try {
-        // Mandatory global variables for Firestore integration
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
-        app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        auth = getAuth(app);
-
-        // Sign in with custom token or anonymously
-        if (initialAuthToken) {
-            await signInWithCustomToken(auth, initialAuthToken);
-        } else {
-            await signInAnonymously(auth);
-        }
-
-        // Listen for auth state changes to get the user ID
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                userId = user.uid;
-                userIdDisplay.textContent = `User ID: ${userId}`;
-                isAuthReady = true;
-                sendBtn.disabled = false;
-                listenForMessages();
-            } else {
-                userId = null;
-                isAuthReady = false;
-                userIdDisplay.textContent = 'Disconnected';
-                sendBtn.disabled = true;
-            }
-        });
-
-    } catch (error) {
-        console.error("Error initializing Firebase:", error);
-        userIdDisplay.textContent = 'Error';
-    }
-}
-
-// Add a message to the chat display
-function addMessageToUI(message, sender, isNew) {
-    const messageElement = document.createElement('div');
-    messageElement.classList.add('message-bubble', `${sender}-message`);
-    
-    if (sender === 'ai') {
-        const senderName = document.createElement('div');
-        senderName.classList.add('sender-name');
-        senderName.textContent = 'Lamla AI';
-        messageElement.appendChild(senderName);
-    }
-    
-    const messageText = document.createElement('p');
-    messageText.textContent = message;
-    messageElement.appendChild(messageText);
-
-    chatMessages.appendChild(messageElement);
-    if (isNew) {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-}
-
-// Listen for new messages in Firestore
-function listenForMessages() {
-    const messagesRef = collection(db, `artifacts/${appId}/public/data/chat_messages`);
-    const q = query(messagesRef, orderBy('createdAt'));
-    
-    // onSnapshot provides real-time updates
-    onSnapshot(q, (snapshot) => {
-        if (!isAuthReady) {
-            return;
-        }
-
-        const changes = snapshot.docChanges();
-        if (changes.length > 0) {
-            // Only add new messages to the UI to avoid re-rendering the entire list
-            changes.forEach(change => {
-                if (change.type === "added") {
-                    const messageData = change.doc.data();
-                    addMessageToUI(messageData.text, messageData.sender, true);
-                }
-            });
-        }
-    }, (error) => {
-        console.error("Error listening to messages:", error);
-    });
-}
-
-// Send message to Firestore
-async function sendMessage() {
-    const text = messageInput.value.trim();
-    if (text === '') return;
-
-    // Display a typing indicator
-    typingIndicator.style.display = 'block';
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    try {
-        // Add the user's message to Firestore
-        await addDoc(collection(db, `artifacts/${appId}/public/data/chat_messages`), {
-            text: text,
-            sender: 'user',
-            userId: userId,
-            createdAt: serverTimestamp(),
-        });
-        messageInput.value = '';
-
-        // Simulate AI response after a delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        const aiResponseText = "This is a placeholder AI response. Once you're ready, we can integrate with a powerful model like Gemini to give you real-time, helpful answers!";
-
-        // Add the AI's response to Firestore
-        await addDoc(collection(db, `artifacts/${appId}/public/data/chat_messages`), {
-            text: aiResponseText,
-            sender: 'ai',
-            createdAt: serverTimestamp(),
-        });
-    } catch (error) {
-        console.error("Error sending message:", error);
-    } finally {
-        typingIndicator.style.display = 'none';
-    }
-}
-
-// File upload placeholder
-function handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-        console.log("File selected:", file.name);
-        // In the future, you would add code here to process the file and send it to the AI for analysis.
-        const aiMessage = `Got it! I received your file, "${file.name}". What would you like to know about it?`;
-        addDoc(collection(db, `artifacts/${appId}/public/data/chat_messages`), {
-            text: aiMessage,
-            sender: 'ai',
-            createdAt: serverTimestamp(),
-        });
-    }
-}
-
-// Event Listeners
-sendBtn.addEventListener('click', sendMessage);
-messageInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
-        sendMessage();
-    }
+// Enable/disable send button
+messageInput.addEventListener("input", () => {
+  sendBtn.disabled = messageInput.value.trim().length === 0;
 });
-document.getElementById('file-input').addEventListener('change', handleFileUpload);
 
 // Auto-resize textarea
-messageInput.addEventListener('input', () => {
-    messageInput.style.height = 'auto';
-    messageInput.style.height = messageInput.scrollHeight + 'px';
+messageInput.addEventListener("input", () => {
+  messageInput.style.height = "auto";
+  messageInput.style.height = messageInput.scrollHeight + "px";
 });
 
-// Initialize the app on page load
-initFirebase();
+// Handle send button
+sendBtn.addEventListener("click", () => sendMessage());
+
+// Send message on Enter (Shift+Enter = new line)
+messageInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+async function sendMessage() {
+  const text = messageInput.value.trim();
+  if (!text) return;
+
+  // Clear input
+  messageInput.value = "";
+  sendBtn.disabled = true;
+  messageInput.style.height = "auto";
+
+  // Add user message bubble
+  addMessageBubble(text, "user");
+
+  // Add empty AI bubble
+  const aiBubble = addMessageBubble("", "ai", "AI Tutor");
+
+  // Show typing indicator
+  typingIndicator.style.display = "flex";
+
+  try {
+    const res = await fetch("/ai/chatbot/stream/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text }),
+    });
+
+    if (!res.ok || !res.body) {
+      aiBubble.querySelector("p").textContent = "[Error: failed to connect]";
+      typingIndicator.style.display = "none";
+      return;
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let fullText = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value, { stream: true });
+      fullText += chunk;
+
+      aiBubble.querySelector("p").textContent = fullText;
+      scrollToBottom();
+    }
+  } catch (err) {
+    console.error("Stream error:", err);
+    aiBubble.querySelector("p").textContent = "[Error: connection issue]";
+  } finally {
+    typingIndicator.style.display = "none";
+  }
+}
+
+function addMessageBubble(text, type, sender = null) {
+  const bubble = document.createElement("div");
+  bubble.classList.add("message-bubble", type === "user" ? "user-message" : "ai-message");
+
+  if (type === "ai") {
+    const nameEl = document.createElement("div");
+    nameEl.className = "sender-name";
+    nameEl.textContent = sender || "AI Tutor";
+    bubble.appendChild(nameEl);
+  }
+
+  const p = document.createElement("p");
+  p.textContent = text;
+  bubble.appendChild(p);
+
+  chatMessages.appendChild(bubble);
+  scrollToBottom();
+
+  return bubble;
+}
+
+function scrollToBottom() {
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}

@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from core.models import BaseModel
+from django.contrib.auth.models import User
 
 MESSAGE_TYPES = (
     ('user', 'User Message'),
