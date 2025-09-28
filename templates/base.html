@@ -61,6 +61,7 @@
             {% block content %}{% endblock %}
         </main>
         
+        {% block footer %}
         <footer class="main-footer">
             <div class="container footer-grid">
                 <div class="footer-col footer-about">
@@ -112,6 +113,7 @@
                </div>
             </div>
         </footer>
+        {% endblock %}
     </div>
     
     <script src="{% static 'js/base.js' %}"></script> 

@@ -5,8 +5,12 @@
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/chat.css' %}">
+    <!-- Ensure Font Awesome is linked for the folder icon and close button -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 {% endblock %}
 
+{% block footer %}{% endblock %}
+f
 {% block content %}
 <div class="chat-container">
     <div class="chat-header">
@@ -24,6 +28,14 @@
 
     <div id="typing-indicator" class="typing-indicator">
         <span class="typing-dot">.</span><span class="typing-dot">.</span><span class="typing-dot">.</span>
+    </div>
+    
+    <!-- NEW: File display area -->
+    <div id="file-status-bar" class="file-status-bar hidden">
+        <span id="file-name-display" class="truncate"></span>
+        <button id="clear-file-btn" title="Remove attachment">
+            <i class="fas fa-times-circle"></i>
+        </button>
     </div>
 
     <div class="chat-input-area">

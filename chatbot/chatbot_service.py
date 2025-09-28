@@ -1,8 +1,7 @@
-# chatbot/chatbot_service.py
 import logging
 import re
 from .models import ChatbotKnowledge
-from core.ai_client import ai_client
+from core.ai_client import ai_client 
 
 logger = logging.getLogger(__name__)
 
@@ -85,15 +84,29 @@ Best Practices in Educational Technology:
         text = re.sub(r'\n{3,}', '\n\n', text)
         return text.strip()
 
-    def generate_response(self, user_message: str, conversation_history=None) -> str:
-        """Generate a chatbot response using AIClient with fallback"""
+    def generate_response(self, user_message: str, conversation_history=None, context_document=None) -> str:
+        """
+        Generate a chatbot response using AIClient, optionally grounding it with context_document.
+        """
         try:
             lamla_knowledge = self.get_lamla_knowledge_base()
             edtech_best_practices = self.get_edtech_best_practices()
 
+            # --- CONTEXT DOCUMENT INTEGRATION START (NEW) ---
+            document_context = ""
+            if context_document:
+                document_context = f"""
+INSTRUCTION: The user has uploaded study material. Use the following text as the primary context for answering their current question.
+DOCUMENT TEXT:
+---
+{context_document}
+---
+"""
+            # --- CONTEXT DOCUMENT INTEGRATION END ---
+
             # Base system prompt
             system_prompt = f"""You are Lamla AI Tutor, a friendly and helpful AI assistant for an educational platform. Your name is Lamla AI Tutor, and you can answer questions about the platform and general topics.
-
+{document_context}
 Context about Lamla AI:
 {lamla_knowledge}
 
@@ -144,7 +157,7 @@ You can also answer general questions and help with various topics. Always maint
             # Call AIClient (handles providers + fallbacks)
             raw_response = ai_client.generate_content(full_prompt, max_tokens=400, raise_on_error=False)
 
-            # Handle dict vs str
+            # Handle dict vs str (simplification from the original snippet, assuming a standardized client)
             if isinstance(raw_response, dict):
                 content = (raw_response.get("choices", [{}])[0]
                            .get("message", {})
@@ -163,9 +176,10 @@ You can also answer general questions and help with various topics. Always maint
 
     def _get_fallback_response(self, user_message: str) -> str:
         """Provide fallback responses when AI is not available"""
+        # ... (Fallback response logic remains the same)
         user_message_lower = user_message.lower()
         if any(word in user_message_lower for word in ['hello', 'hi', 'hey']):
-            return """Hello there! 👋 I'm Lamla AI Tutor, your friendly AI assistant. 
+             return """Hello there! 👋 I'm Lamla AI Tutor, your friendly AI assistant. 
 
 I'm here to help you with:
 • Questions about our learning platform
