@@ -13,7 +13,7 @@ const clearFileBtn = document.getElementById("clear-file-btn");
 
 // --- State Variables ---
 let attachedFile = null;
-let isProcessingFile = false; // NEW STATE: True when file is sent and text extraction is ongoing.
+let isProcessingFile = false; // True when file is sent and text extraction is ongoing.
 
 // --- Utility Functions ---
 
@@ -126,7 +126,7 @@ async function sendMessage() {
         if (fileToSend) {
             // A. File Upload (Non-streaming endpoint: /ai/chatbot/file/)
             const apiUrl = "/ai/chatbot/file/";
-            aiParagraph.textContent = "Uploading and processing file... This may take a moment.";
+            aiParagraph.textContent = "Processing file... This may take a moment.";
             
             const formData = new FormData();
             formData.append('file_upload', fileToSend); 
