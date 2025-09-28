@@ -13,4 +13,6 @@ urlpatterns = [
     path('flashcards/', views.flashcards, name='flashcards'),
     path('generate-flashcards/', views.generate_flashcards, name='generate_flashcards'),
     path('test-flashcard-generator/', views.test_flashcard_generator, name='test_flashcard_generator'),
+    
+    path('exam-analyzer/', views.exam_analyzer, name='exam_analyzer'),
 ]

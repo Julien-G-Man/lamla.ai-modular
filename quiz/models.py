@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import logging
-
+from materials.models import ExamDocument
 
 class QuizSession(BaseModel):
     """Model to track quiz sessions and results"""
@@ -66,3 +66,18 @@ class QuestionCache(models.Model):
 
     def __str__(self):
         return f"Cache for {self.question_content_hash[:8]}..."
+    
+class ExamAnalysis(BaseModel):
+    """Model to store exam analysis results"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exam_analyses')
+    subject = models.CharField(max_length=100, help_text="Subject being analyzed", db_index=True)
+    documents_analyzed = models.ManyToManyField(ExamDocument, related_name='analyses')
+    analysis_data = models.JSONField(default=dict, help_text="Analysis results including trends and predictions")
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Exam Analysis"
+        verbose_name_plural = "Exam Analyses"
+        
+    def __str__(self):
+        return f"Analysis for {self.subject} by {self.user.username}"    

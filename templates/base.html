@@ -30,9 +30,9 @@
                     <ul class="nav-links" id="navLinks"> 
                         <li><a href="{% url 'home' %}">Home</a></li>
                         <li><a href="{% url 'about' %}">About</a></li>
+                        <li><a href="{% url 'chatbot' %}">AI Tutor</a></li>
                         <li><a href="{% url 'custom_quiz' %}">Quiz</a></li>
                         <li><a href="{% url 'flashcards' %}">Flashcards</a></li>
-                        <li><a href="{% url 'exam_analyzer' %}">Analytics</a></li>
                         
                         {% if user.is_authenticated %}
                             <li class="nav-item-cta"><a href="{% url 'dashboard' %}" class="btn btn-nav-cta">Dashboard</a></li>
@@ -87,8 +87,10 @@
                         <li><a href="{% url 'home' %}">Home</a></li>
                         <li><a href="{% url 'about' %}">About Us</a></li>
                         <li><a href="{% url 'contact' %}">Contact</a></li>
+                        <li><a href="{% url 'chatbot' %}">AI Tutor</a></li>
                         <li><a href="{% url 'custom_quiz' %}">Quiz</a></li>
                         <li><a href="{% url 'flashcards' %}">Flashcards</a></li>
+                        <li><a href="{% url 'exam_analyzer' %}">Exam analyzer</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">

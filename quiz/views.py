@@ -24,11 +24,11 @@ import uuid
 from django.urls import reverse
 import uuid
 
-from analytics.models import ExamDocument, ExamAnalysis
 from .services import QuizService
 from .question_generator import generate_questions_from_text
 from .flashcard_generator import generate_flashcards_from_text
 from .quiz_download_utils import handle_quiz_download
+from .exam_analyzer import perform_exam_analysis
 
 
 logger = logging.getLogger(__name__)
@@ -538,4 +538,8 @@ def generate_flashcards(request):
 def test_flashcard_generator(request):
     """Renders the test page for flashcards."""
     return render(request, 'quiz/test_flashcard_generator.html')
+
+def exam_analyzer(request):
+    ''' Delegates all work to exam_analyzer.py '''
+    return perform_exam_analysis(request, 'quiz/exam_analyzer.html')
 
