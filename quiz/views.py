@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponse, FileResponse 
+from django.http import JsonResponse, HttpResponse, FileResponse, HttpResponseRedirect 
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
@@ -29,7 +29,7 @@ from .question_generator import generate_questions_from_text
 from .flashcard_generator import generate_flashcards_from_text
 from .quiz_download_utils import handle_quiz_download
 from .exam_analyzer import perform_exam_analysis
-
+from core.cookies import set_quiz_preference_cookie, get_quiz_preference_cookie 
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +49,16 @@ def custom_quiz(request):
     if 'quiz_results' in request.session:
         del request.session['quiz_results']
     
-    return render(request, 'quiz/custom_quiz.html')
+    # READ PREFERENCE COOKIE: Get default number of MCQ questions
+    # Get the value, defaulting to 5 if not found
+    default_num_mcq = int(get_quiz_preference_cookie(request, 'pref_num_mcq', 5))
+    
+    context = {
+        'default_num_mcq': default_num_mcq
+        # You can add other defaults here (e.g., pref_difficulty)
+    }    
+    
+    return render(request, 'quiz/custom_quiz.html', context)
 
 
 @require_http_methods(["POST"])
@@ -278,7 +287,13 @@ def generate_questions(request):
             del request.session['quiz_user_answers']
         
         logger.info("Quiz generation successful - redirecting to quiz page")
-        return redirect('quiz')
+        # prepare the redirect response
+        response = redirect('quiz')
+        
+        # SET PREFERENCE COOKIE: Set the user's chosen num_mcq as a default preference
+        # This will be read next time they load the custom_quiz page.
+        response = set_quiz_preference_cookie(response, 'pref_num_mcq', str(num_mcq))
+        return response
         
     except Exception as e:
         logger.error(f"Unexpected error in generate_questions: {str(e)}", exc_info=True)
