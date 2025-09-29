@@ -29,7 +29,8 @@ from .question_generator import generate_questions_from_text
 from .flashcard_generator import generate_flashcards_from_text
 from .quiz_download_utils import handle_quiz_download
 from .exam_analyzer import perform_exam_analysis
-from core.cookies import set_quiz_preference_cookie, get_quiz_preference_cookie 
+from core.cookies import set_quiz_preference_cookie, get_quiz_preference_cookie, set_quiz_preference_cookie, get_quiz_preference_cookie 
+
 
 logger = logging.getLogger(__name__)
 
@@ -287,12 +288,15 @@ def generate_questions(request):
             del request.session['quiz_user_answers']
         
         logger.info("Quiz generation successful - redirecting to quiz page")
+        
         # prepare the redirect response
         response = redirect('quiz')
         
         # SET PREFERENCE COOKIE: Set the user's chosen num_mcq as a default preference
         # This will be read next time they load the custom_quiz page.
-        response = set_quiz_preference_cookie(response, 'pref_num_mcq', str(num_mcq))
+        response = set_quiz_preference_cookie(request,response, 'pref_num_mcq', str(num_mcq))
+        
+        # Return the response with the potentially attached cookie
         return response
         
     except Exception as e:

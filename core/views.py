@@ -19,7 +19,7 @@ def home(request):
     response = render(request, 'core/home.html', context)
     
     # 2. Pass the response to the utility function to set the cookie
-    response = set_last_visit_cookie(response)
+    response = set_last_visit_cookie(request, response)
 
     return response
 

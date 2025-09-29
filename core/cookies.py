@@ -1,30 +1,63 @@
 from datetime import datetime, timezone
 import json
 import uuid
-from django.http import HttpResponse # Required for type hinting/reference
+from django.http import HttpResponse 
 import json
+
+
+# --- CONSTANTS ---
+CONSENT_COOKIE_NAME = 'user_consent'
+CONSENT_ACCEPTED_VALUE = 'accepted'
+
+def has_consent(request) -> bool:
+    """Checks if the user has accepted non-essential cookies."""
+    # Note: Only 'Strictly Necessary' cookies (like sessionid) are exempt from this check.
+    return request.COOKIES.get(CONSENT_COOKIE_NAME) == CONSENT_ACCEPTED_VALUE
+
+def set_consent_cookie(response: HttpResponse) -> HttpResponse:
+    """Sets the primary consent cookie after user accepts (Server-Side)."""
+    response.set_cookie(
+        key=CONSENT_COOKIE_NAME,
+        value=CONSENT_ACCEPTED_VALUE,
+        max_age=3600 * 24 * 365, # 1 Year expiration for consent
+        httponly=True,           # Prevent client-side JS access 
+        samesite='Lax'
+    )
+    return response
 
 # ===============================================
 # CORE APP COOKIE: Last Visit Timestamp
 # ===============================================
 
-def set_last_visit_cookie(response: HttpResponse) -> HttpResponse:
-    """Sets a cookie tracking the current time for the user's last visit."""
-    current_time = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S %Z')
+def set_last_visit_cookie(request, response: HttpResponse) -> HttpResponse:
+    """Sets a cookie tracking the current time for the user's last visit only if the user has consented"""
+    if has_consent(request):
+       current_time = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S %Z')
     
-    response.set_cookie(
-        key='last_visit_time', 
-        value=current_time, 
-        max_age=3600 * 24 * 365, # 1 Year
-        httponly=False, 
-        samesite='Lax'
-    )
+       response.set_cookie(
+           key='last_visit_time', 
+           value=current_time, 
+           max_age=3600 * 24 * 365, # 1 Year
+           httponly=False, 
+           samesite='Lax'
+       )
     return response
 
 def get_last_visit_time(request) -> str | None:
     """Reads the last visit cookie from the request."""
     return request.COOKIES.get('last_visit_time', None)
 
+# QUIZ APP COOKIE: Preference for number of MCQ questions
+def set_quiz_preference_cookie(request, response: HttpResponse, key: str, value: str) -> HttpResponse:
+    """Stores a quiz preference only if user has consented."""
+    if has_consent(request):
+        response.set_cookie(key, value, max_age=3600 * 24 * 30, samesite='Lax')
+    return response
+
+def get_quiz_preference_cookie(request, key: str, default: str | int) -> str | int:
+    """Reads a quiz preference cookie."""
+    return request.COOKIES.get(key, str(default))
+ 
 # ===============================================
 # QUIZ APP COOKIE: Temporary Score Summary
 # ===============================================
@@ -64,7 +97,7 @@ def get_and_delete_quiz_summary(request, response: HttpResponse) -> dict | None:
 # ===============================================
 
 def get_or_create_chat_session(request, response: HttpResponse) -> tuple[str, HttpResponse]:
-    """Reads the chat session ID or creates a new one if none exists."""
+    """Reads the chat session ID or creates a new one if none exists, only setting the persistent cookie if consent is given."""
     session_id = request.COOKIES.get('chat_session_id')
     
     if not session_id:
@@ -73,8 +106,9 @@ def get_or_create_chat_session(request, response: HttpResponse) -> tuple[str, Ht
     else:
         is_new = False
 
-    # If new, set the cookie; if old, renew the expiration (optional, but good practice)
-    if is_new or True: # Use 'or True' to renew the cookie on every visit
+    # The persistent cookie is only set/renewed IF consent is given
+    if has_consent(request): 
+        # We set it if new, or renew the expiration if existing
         response.set_cookie(
             key='chat_session_id', 
             value=session_id, 
@@ -82,6 +116,8 @@ def get_or_create_chat_session(request, response: HttpResponse) -> tuple[str, Ht
             httponly=True, # Prevent client-side JS access for security
             samesite='Lax'
         )
+     # NOTE: If consent is not given, the session_id will ONLY exist for the
+     # duration of the browser tab/session (not persisted across restarts)  
         
     return session_id, response
  
