@@ -25,14 +25,15 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     # The core app handles the main and static pages.
-    path('', include('core.urls')), 
+    path('', include(('core.urls', 'core'), namespace='core')), 
 
+    # other apps serve dynamic pages with heavy logic
     path('accounts/', include('accounts.urls')),
     path('', include('materials.urls')),
-    path('practice/', include('quiz.urls')),
-    path('ai/', include('chatbot.urls')),
+    path('practice/', include(('quiz.urls', 'quiz'), namespace='quiz')),
+    path('ai/', include(('chatbot.urls', 'ai'), namespace='ai')),
     path('analytics/', include('analytics.urls')),
-    path('', include('feedback.urls')),
+    path('', include(('feedback.urls', 'feedback'), namespace='feedback')),
     path('accounts/', include('allauth.urls')),
     
     # Route to sserve service worker

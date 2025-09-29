@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="{% static 'css/custom_quiz.css' %}">
 {% endblock %}
 
+{%  block footer%} {% endblock%}
+
 {% block content %}
 <div class="page-wrapper">
     <div class="quiz-card-container" role="main">
@@ -17,7 +19,7 @@
             Upload your study materials or paste content to create customized quiz questions with AI.
         </p>
 
-        <form id="quizForm" method="post" enctype="multipart/form-data" action="{% url 'generate_questions' %}">
+        <form id="quizForm" method="post" enctype="multipart/form-data" action="{% url 'quiz:generate_questions' %}">
             {% csrf_token %}
 
             <!-- Subject selection: select + optional custom input -->

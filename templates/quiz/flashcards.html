@@ -23,7 +23,7 @@
                 </div>
                 Generate Your Flashcards
             </h2>
-            <form id="flashcardForm" method="post" action="{% url 'generate_flashcards' %}" enctype="multipart/form-data">
+            <form id="flashcardForm" method="post" action="{% url 'quiz:generate_flashcards' %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="form-grid">
                     <div class="form-group">

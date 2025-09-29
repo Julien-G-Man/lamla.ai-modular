@@ -40,7 +40,7 @@
                             {% endfor %}
                         {% endif %}
 
-                        <form method="post" class="contact-form" action="{% url 'contact' %}" id="contactForm">
+                        <form method="post" class="contact-form" action="{% url 'feedback:contact' %}" id="contactForm">
                             {% csrf_token %}
                             
                             <div class="form-row">
@@ -134,16 +134,7 @@
                 </div>
                 
                 <div class="social-grid">
-                    <a href="https://x.com/lamla_i" class="social-card">
-                        <div class="social-icon">
-                            <i class="fab fa-twitter"></i>
-                        </div>
-                        <div class="social-content">
-                            <h4>Twitter</h4>
-                            <p>Follow for updates and tips</p>
-                        </div>
-                    </a>
-                    
+
                     <a href="https://linkedin.com/company/lamla-ai" class="social-card">
                         <div class="social-icon">
                             <i class="fab fa-linkedin"></i>
@@ -164,7 +155,7 @@
                         </div>
                     </a>
                     
-                    <a href="https://www.facebook.com/share/16pmyhCiUM/" class="social-card">
+                    <a href="https://www.facebook.com/people/LamlaAI/61578006032583/" class="social-card">
                         <div class="social-icon">
                             <i class="fab fa-facebook"></i>
                         </div>
@@ -173,6 +164,17 @@
                             <p>Join our community</p>
                         </div>
                     </a>
+                   
+                    <a href="https://x.com/lamla_i" class="social-card">
+                        <div class="social-icon">
+                            <i class="fab fa-twitter"></i>
+                        </div>
+                        <div class="social-content">
+                            <h4>Twitter</h4>
+                            <p>Follow for updates and tips</p>
+                        </div>
+                    </a>
+                                        
                 </div>
             </div>
         </div>
