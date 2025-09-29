@@ -195,3 +195,23 @@ document.addEventListener('DOMContentLoaded', function() {
         element.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
     });
 });
+
+// Service Worker Registration Logic
+(function() {
+    // Check if the browser supports Service Workers
+    if ('serviceWorker' in navigator) {
+        // Wait for the window to finish loading to register the SW
+        window.addEventListener('load', () => {
+            // Registering at the root scope (/) is crucial for full site control
+            navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+                .then(registration => {
+                    console.log('ServiceWorker registered successfully with scope:', registration.scope);
+                })
+                .catch(error => {
+                    console.error('ServiceWorker registration failed:', error);
+                });
+        });
+    } else {
+        console.warn('Service Workers are not supported in this browser.');
+    }
+})();
